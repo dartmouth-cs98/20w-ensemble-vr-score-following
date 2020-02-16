@@ -18,7 +18,8 @@ trills.
 * We are prioritizing pitch detection implementation before continuing work on score-following. If our final product 
 cannot detect polyphonic audio in real-time, there might as well not be a score-following element since not everyone 
 owns a MIDI instrument. We look to X. Li (2018) for guidance in developing a reliable neural network approach to this 
-problem.
+problem. We will be using an approacch involving convolutional NN using audio spectrograms as input. This follows from 
+work done by Carl Thomé.
 
 # Citations
 * Initial inspiration and model: https://hal.inria.fr/hal-01183820/document
