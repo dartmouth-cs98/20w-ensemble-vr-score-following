@@ -6,6 +6,7 @@ class TimeLine:
     def __init__(self, midi_file):
         self.time_line = {}
         self.midi_file = midi_file
+        self.playing_notes = []
 
     def gen_time_line(self):
         """
@@ -18,10 +19,10 @@ class TimeLine:
             for message in self.midi_file.tracks[i]:
                 curr_time += message.time
                 if(message.type == 'note_on'):
-                    on_notes.append(message.note)
+                    on_notes.append(message)
                     self.time_line[curr_time] = on_notes.copy()
                 elif(message.type == 'note_off'):
-                    on_notes.remove(message.note)
+                    on_notes.remove(message)
                     self.time_line[curr_time] = on_notes.copy()
 
     def get_time_line(self):
@@ -31,5 +32,15 @@ class TimeLine:
         return self.midi_file
 
     def play_back(self, time):
-        self.time_line[time]
+        for note in self.playing_notes:
+            if note not in self.time_line[time]:
+                self.playing_notes.remove(note)
+                #send off message to output
+        for note in self.time_line[time]:
+            if note not in self.playing_notes:
+                self.playing_notes.append(note)
+                #send on message to output
+
+
+
 
