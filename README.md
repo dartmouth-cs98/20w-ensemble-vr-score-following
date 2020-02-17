@@ -21,6 +21,8 @@ owns a MIDI instrument. We look to X. Li (2018) for guidance in developing a rel
 problem. We will be using an approacch involving convolutional NN using audio spectrograms as input. This follows from 
 work done by Carl Thomé.
 
+After experimenting with the results of Henkel et al. we have decided that it would not be effective to, for this project, approach the problem of score following using reinforcement learning. Granted, the techniques described in the paper do have many benefits. For example, there is no need for any sort of computer-readable input such as MIDI. Additionally, the model is trained end to end, which eliminates a lot of the preprocessing work that is required in other studies. However, these benefits do not outweight the insurmountable hurdle that the results are not accurate enough to be used practically in any sort of customer-facing application. Even though the research in Henkel et al is very promising, given the time frame of our project, pursuing further research on the topic does not seem like a viable option.
+
 # Citations
 * Initial inspiration and model: https://hal.inria.fr/hal-01183820/document
 * Table 5 distribution for pitch probabilities: https://arxiv.org/pdf/1404.2313.pdf
