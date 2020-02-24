@@ -43,7 +43,10 @@ class TimeLine:
         """
         t0 = time.time()
         port = mido.open_output('New Port', virtual=True)
-        for message in self.setup:
+        for message in self.midi_file.play():
+            port.send(message)
+
+        """for message in self.setup:
             print(message)
             port.send(message)
         if time.time() - t0 in self.time_line.keys():
@@ -57,4 +60,4 @@ class TimeLine:
                     message = Message('note_on', note=note, velocity=100, time=0)
                     port.send(message)
                     self.playing_notes.append(note)
-
+"""
