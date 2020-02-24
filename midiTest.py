@@ -1,7 +1,8 @@
 """
-Test code for MIDI file reading from the below repository.
+Test code for MIDI file reading.
 """
 import sys
+import mido
 from mido import MidiFile
 from midiTimeline import TimeLine
 
@@ -12,6 +13,10 @@ if __name__ == '__main__':
 
     midi_file = MidiFile(filename)
 
+    port = mido.open_output('New Port', virtual=True)
+    for message in midi_file.play():
+        print(message)
+        port.send(message)
     time_line = TimeLine(midi_file)
     time_line.gen_time_line()
-    print(time_line.get_time_line())
+    time_line.play_back()
