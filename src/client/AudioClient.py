@@ -30,25 +30,35 @@ class AudioClient:
             print(status, file=sys.stderr)
 
         data = indata.copy().squeeze()
-        # self.q.put(librosa.core.cqt(data, sr=self.sample_rate))
-        self.q.put(librosa.feature.chroma_cqt(y=data, sr=self.sample_rate))
-
+        # cqt = self.q.put(librosa.core.cqt(data, sr=self.sample_rate))
+        cqt = librosa.feature.chroma_cqt(y=data, sr=self.sample_rate)
+        print(cqt)
+        self.q.put(cqt)
 
     def record(self, plot=False):
         stream = sd.InputStream(channels=1, callback=self.audio_callback, blocksize=2048, samplerate=self.sample_rate)
         with stream:
-            while self.continue_recording:
-                print(self.q.qsize())
+            print("Press Return to Stop Recording")
+            input()
 
         if plot:
+            full_plot = None
             while not self.q.empty():
                 data = self.q.get()
-                librosa.display.specshow(data, y_axis='chroma', x_axis='time')
-                plt.show()
+                data = np.mean(data, axis=1).reshape((data.shape[0], 1))
+                # data[data < 0.75] = 0
+                if full_plot is None:
+                    full_plot = data
+                else:
+                    full_plot = np.column_stack((full_plot, data))
+            librosa.display.specshow(full_plot, y_axis='chroma', x_axis='time')
+            plt.colorbar()
+            plt.set_cmap("bwr")
+            plt.show()
 
     def stop_recording(self):
-        self.continue_recording = False;
+        self.continue_recording = False
 
 
 client = AudioClient()
-client.record()
+client.record(plot=True)
