@@ -19,7 +19,7 @@ class AudioClient:
         self.downsample = downsample
         self.interval = interval
         self.mapping = [c - 1 for c in self.channels]  # Channel numbers start with 1
-        self.q = queue.Queue()
+        self.q = []
         self.lines = None
         self.plotdata = None
         self.continue_recording = True
@@ -30,27 +30,22 @@ class AudioClient:
             print(status, file=sys.stderr)
 
         data = indata.copy().squeeze()
-        # cqt = self.q.put(librosa.core.cqt(data, sr=self.sample_rate))
         cqt = librosa.feature.chroma_cqt(y=data, sr=self.sample_rate)
+        cqt = np.mean(cqt, axis=1).reshape((cqt.shape[0], 1))
         print(cqt)
-        self.q.put(cqt)
+        self.q.append(cqt)
 
-    def record(self, plot=False):
+    def record(self, plot=False, time=0):
         stream = sd.InputStream(channels=1, callback=self.audio_callback, blocksize=2048, samplerate=self.sample_rate)
         with stream:
-            print("Press Return to Stop Recording")
-            input()
+            if time == 0:
+                print("Press Return to Stop Recording")
+                input()
+            else:
+                sd.sleep(time * 2000)
 
         if plot:
-            full_plot = None
-            while not self.q.empty():
-                data = self.q.get()
-                data = np.mean(data, axis=1).reshape((data.shape[0], 1))
-                # data[data < 0.75] = 0
-                if full_plot is None:
-                    full_plot = data
-                else:
-                    full_plot = np.column_stack((full_plot, data))
+            full_plot = np.concatenate(self.q, axis=1)
             librosa.display.specshow(full_plot, y_axis='chroma', x_axis='time')
             plt.colorbar()
             plt.set_cmap("bwr")
@@ -59,6 +54,34 @@ class AudioClient:
     def stop_recording(self):
         self.continue_recording = False
 
+    def estimate_mean_covariance(self):
+        full_plot = np.concatenate(self.q, axis=1)
+        sample_mean = np.mean(full_plot, axis=1).reshape((full_plot.shape[0], 1))
+        sample_cov = np.cov(full_plot)
 
-client = AudioClient()
-client.record(plot=True)
+        print("Mean:", sample_mean)
+        print("Cov: ", sample_cov)
+        return sample_mean, sample_cov
+
+
+if __name__ == "__main__":
+    import time
+
+    for i in range(12):
+        input("Press Return to Begin Recording for Pitch {0}".format(i))
+        time.sleep(2)
+        client = AudioClient()
+        client.record(plot=True, time=10)
+        mean, cov = client.estimate_mean_covariance()
+
+        np.save("res/mean_{0}".format(i), mean)
+        np.save("res/cov_{0}".format(i), cov)
+
+    input("Press Return to Begin Recording for Silence")
+    time.sleep(2)
+    client = AudioClient()
+    client.record(plot=True, time=10)
+    mean, cov = client.estimate_mean_covariance()
+
+    np.save("res/mean_-1", mean)
+    np.save("res/cov_-1", cov)
