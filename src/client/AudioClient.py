@@ -12,7 +12,7 @@ class AudioClient:
     Class that handles input from microphone
     """
 
-    def __init__(self, sample_rate=44100, window=200, channels=[1], downsample=10, interval=30, blocksize = 2048):
+    def __init__(self, sample_rate=44100, window=200, channels=[1], downsample=10, interval=30, blocksize = 4096):
         self.sample_rate = sample_rate
         self.window = window
         self.channels = channels
@@ -33,7 +33,6 @@ class AudioClient:
         data = indata.copy().squeeze()
         cqt = librosa.feature.chroma_cqt(y=data, sr=self.sample_rate)
         cqt = np.mean(cqt, axis=1).reshape((cqt.shape[0], 1))
-        print(cqt)
         self.q.append(cqt)
 
     def record(self, plot=False, time=0):
@@ -42,6 +41,7 @@ class AudioClient:
             if time == 0:
                 print("Press Return to Stop Recording")
                 input()
+                self.continue_recording = False
             else:
                 sd.sleep(time * 2000)
 

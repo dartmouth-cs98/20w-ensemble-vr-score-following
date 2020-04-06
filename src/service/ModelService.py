@@ -1,5 +1,5 @@
-import numpy as np
 import os
+import numpy as np
 from scipy.stats import multivariate_normal
 
 from src.model.Score import Pieces, ScoreFactory
@@ -9,8 +9,9 @@ class Model:
 
     def __init__(self, audio_client, instrument="violin", piece=Pieces.Twinkle):
         self.piece = piece
+        self.score = ScoreFactory.get_score(piece)
         self.L = 2
-        self.N = piece.N
+        self.N = self.score.N
         self.audio_client = audio_client
 
         self.a = np.zeros((self.N + 1, self.L, self.N + 1, self.L))  # transition matrix
@@ -20,7 +21,7 @@ class Model:
         # proability of pitch errors. Eq(17) Section IVB2.
         self.C = 1.0e-50
         # probability of entering break state, 1 * 10^{-x} for some positive x
-        self.s = 1.0e-10
+        self.s = 1.0e-100
         # probability of resuming performance, uniform for all N
         self.r = 1 / self.N
         # probability of deletion error
@@ -34,8 +35,12 @@ class Model:
         self.initialize_overtones()
         self.K = [x for x in self.mu]
 
-        self.score = ScoreFactory.get_score(piece)
+        # Forward algorithm variables
+        self.t = 0
+        self.alpha = np.zeros((self.N + 1, self.L))
+
         self.initialize_initial_probabilities()
+        self.initialize_transition_matrix()
 
     def initialize_overtones(self):
         """
@@ -47,18 +52,24 @@ class Model:
 
         for file in os.listdir(directory):
             filename = os.fsdecode(file)
-            note = filename[-5]
-            self.mu[note] = np.load(base_path + "/mean/" + filename)
+            note = filename.split('_')[1].split('.')[0]
+            self.mu[note] = np.load(base_path + "/mean/" + filename).squeeze()
 
         directory = os.fsencode(base_path + "/cov")
 
         for file in os.listdir(directory):
             filename = os.fsdecode(file)
-            note = filename[-5]
-            self.Sigma[note] = np.load(base_path + "/cov/" + filename)
+            note = filename.split('_')[1].split('.')[0]
+            # self.Sigma[note] = np.load(base_path + "/cov/" + filename).squeeze()
+            temp = np.load(base_path + "/cov/" + filename).squeeze()
+            self.Sigma[note] = np.zeros(temp.shape)
+            np.fill_diagonal(self.Sigma[note], np.diag(temp))
 
-        self.mu["-1"] = np.load(base_path + "/mean/mean_-1.npy")
-        self.Sigma["-1"] = np.load(base_path + "/cov/cov_-1.npy")
+        self.mu["-1"] = np.load(base_path + "/mean/mean_-1.npy").squeeze()
+
+        temp = np.load(base_path + "/cov/cov_-1.npy").squeeze()
+        self.Sigma["-1"] = np.zeros(temp.shape)
+        np.fill_diagonal(self.Sigma["-1"], np.diag(temp))
 
     def parse_piece(self):
         """
@@ -66,10 +77,10 @@ class Model:
         :return:
         """
 
-        for i, note in self.piece.notes:
-            num_beats = note.duration
+        for i, note in enumerate(self.score.notes):
+            num_beats = note.duration.value
 
-            fpb = self.get_frames_per_beat(self.piece.tempo, self.audio_client.sample_rate, self.audio_client.blocksize)
+            fpb = self.get_frames_per_beat(self.score.tempo, self.audio_client.sample_rate, self.audio_client.blocksize)
             self.a[i, 0, i, 0] = 1 - 1 / (fpb * num_beats)
 
         self.a[self.N, 0, self.N, 0] = 0.996
@@ -84,10 +95,11 @@ class Model:
 
         self.parse_piece()
 
+        self.a[:, 1, :, 0] = 0  # a_{1,0}
+        self.a[:, 1, :, 1] = 0.999  # a_{1,1}
+        self.a[:, 0, :, 1] = 1.0e-100  # a_{0,1}
+
         for i in range(self.N):
-            self.a[i, 1, i, 0] = 0  # a_{1,0}
-            self.a[i, 1, i, 1] = 0.999  # a_{1,1}
-            self.a[i, 0, i, 1] = 1.0e-100  # a_{0,1}
 
             self.initialize_exit_probabilities(i)
 
@@ -129,21 +141,26 @@ class Model:
                 l_prime_sum += self.a[i, l, i, lp]
             self.e[i, l] = 1 - l_prime_sum
 
-        self.e[self.N, 0] = 0.004 # = 1 - a^{N}_0,0
+        self.e[self.N, 0] = 0.004  # = 1 - a^{N}_0,0
 
     def b(self, y_t, i, l):
         """
         Probability of observing audio feature y_t at bottom state l of top state i
         :return:
         """
-        if l == 0:
+        if i == self.N or l == 1:
+            pdf = multivariate_normal.pdf(y_t, self.mu["-1"], self.Sigma["-1"])
+            return 0.999 if pdf > 10 else pdf
+        elif l == 0:
             prob = 0
-            p_i = self.score.notes[i].pitch.value
+            p_i = self.score.notes[i].pitch.value[0]
             for k in self.K:
-                w = self.get_weight(k, p_i)
-                prob += w * multivariate_normal.pdf(y_t, self.mu[k], self.Sigma[k])
-        elif l == 1:
-            return multivariate_normal.pdf(y_t, self.mu["-1"], self.Sigma["-1"])
+                w = self.get_weight(int(k), p_i)
+                pdf = multivariate_normal.pdf(y_t, self.mu[k], self.Sigma[k])
+                if pdf > 10:
+                    pdf = 0.999
+                prob += w * pdf
+            return prob
 
     def get_weight(self, k, p_i):
         """
@@ -152,7 +169,7 @@ class Model:
         :param p_i:
         :return:
         """
-        offset = abs(k - p_i)
+        offset = min(min(abs(k - p_i), (12 - p_i) + k), (12 - k) + p_i)
 
         if offset == 0:
             return 1 - self.C
@@ -160,14 +177,41 @@ class Model:
             return self.C * 0.175
         elif offset == 2:
             return self.C * 0.270
-        elif offset == 7:
+        elif offset == 7 or offset == 5:
             return self.C * 0.055
         else:
             return 0
 
-    def decode(self):
-        pass
-
     def get_frames_per_beat(self, bpm, sample_rate, block_size):
         frames_per_minute = (sample_rate / block_size) * 60
         return frames_per_minute / bpm
+
+    def next_observation(self, obs):
+        """
+        Implements another iteration of forward algorithm
+        Updates belief state of what the current music event is
+        :return:
+        """
+
+        if self.t == 0:
+            for i in range(self.N + 1):
+                for l in range(self.L):
+                    self.alpha[i, l] = self.b(obs, i, l) * self.pi[i, l]
+            self.t += 1
+            return np.unravel_index(np.argmax(self.alpha), self.alpha.shape), np.max(self.alpha)
+        else:
+            new_alpha = np.zeros((self.N + 1, self.L))
+            for i in range(self.N + 1):
+                nbh = max(-i, -2)
+
+                for l in range(self.L):
+                    if i < self.N:
+                        new_alpha[i, l] = self.b(obs, i, l) * (
+                                np.sum(self.alpha[i + nbh:i + 1, :] * self.a[i + nbh:i + 1, :, i, l])
+                                + np.sum(self.alpha[self.N, :] * self.a[self.N, :, i, l]))
+                    elif i == self.N:
+                        new_alpha[i, l] = self.b(obs, i, 0) * (np.sum(self.alpha[self.N, :] * self.a[:, :, self.N, l]))
+
+            self.alpha = new_alpha
+
+            return np.unravel_index(np.argmax(self.alpha), self.alpha.shape), np.max(self.alpha)
