@@ -1,25 +1,27 @@
-from matplotlib.animation import FuncAnimation
+import queue
+import sys
+
+import librosa
+import librosa.display
 import matplotlib.pyplot as plt
 import numpy as np
 import sounddevice as sd
-import queue
-import sys
-import librosa
-import librosa.display
+
 
 class AudioClient:
     """
     Class that handles input from microphone
     """
 
-    def __init__(self, sample_rate=44100, window=200, channels=[1], downsample=10, interval=30):
+    def __init__(self, sample_rate=48000, window=200, channels=[1], downsample=10, interval=30, blocksize=4096):
         self.sample_rate = sample_rate
         self.window = window
         self.channels = channels
         self.downsample = downsample
         self.interval = interval
+        self.blocksize = blocksize
         self.mapping = [c - 1 for c in self.channels]  # Channel numbers start with 1
-        self.q = []
+        self.q = queue.Queue()
         self.lines = None
         self.plotdata = None
         self.continue_recording = True
@@ -32,15 +34,16 @@ class AudioClient:
         data = indata.copy().squeeze()
         cqt = librosa.feature.chroma_cqt(y=data, sr=self.sample_rate)
         cqt = np.mean(cqt, axis=1).reshape((cqt.shape[0], 1))
-        print(cqt)
-        self.q.append(cqt)
+        self.q.put(cqt)
 
     def record(self, plot=False, time=0):
-        stream = sd.InputStream(channels=1, callback=self.audio_callback, blocksize=2048, samplerate=self.sample_rate)
+        stream = sd.InputStream(channels=1, callback=self.audio_callback, blocksize=self.blocksize,
+                                samplerate=self.sample_rate)
         with stream:
             if time == 0:
                 print("Press Return to Stop Recording")
                 input()
+                self.continue_recording = False
             else:
                 sd.sleep(time * 2000)
 
