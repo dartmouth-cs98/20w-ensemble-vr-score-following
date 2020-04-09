@@ -23,15 +23,25 @@ class RecordThread(threading.Thread):
 if __name__ == "__main__":
     audio_client = AudioClient()
     model = Model(audio_client)
+    live = True
 
-    # record_thread = RecordThread(audio_client)
-    # record_thread.start()
+    if live:
+        # audio_client.record()
+        record_thread = RecordThread(audio_client)
+        record_thread.start()
 
-    t = 0
-    q = np.load("Twinkle_Recording.npy")[:, :]
+        i = 0
+        while True:
+            obs = audio_client.q.get().squeeze()
+            current_state, prob = model.next_observation(obs)
+            print(current_state, prob)
 
-    while t < len(q[0]):
-        obs = q[:, t]
-        current_state, prob = model.next_observation(obs)
-        print(current_state, t, prob)
-        t += 1
+    else:
+        t = 0
+        q = np.load("Twinkle_Recording.npy")[:, :]
+
+        while t < len(q[0]):
+            obs = q[:, t]
+            current_state, prob = model.next_observation(obs)
+            print(current_state, t, prob)
+            t += 1

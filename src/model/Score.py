@@ -60,4 +60,4 @@ class TwinkleTwinkleScore(Score):
         self.N = len(self.notes)
 
     def set_tempo(self):
-        self.tempo = 60
+        self.tempo = 75
