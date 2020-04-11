@@ -30,4 +30,3 @@ class Duration(Enum):
     Half = 2
     Dotted_Half = 3
     Whole = 4
-

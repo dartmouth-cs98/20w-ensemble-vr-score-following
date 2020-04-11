@@ -13,7 +13,7 @@ class AudioClient:
     Class that handles input from microphone
     """
 
-    def __init__(self, sample_rate=48000, window=200, channels=[1], downsample=10, interval=30, blocksize=4096):
+    def __init__(self, sample_rate=44100, window=200, channels=[1], downsample=10, interval=30, blocksize=4096):
         self.sample_rate = sample_rate
         self.window = window
         self.channels = channels
@@ -25,6 +25,7 @@ class AudioClient:
         self.lines = None
         self.plotdata = None
         self.continue_recording = True
+        self.frames_per_min = 570
 
     def audio_callback(self, indata, frames, time, status):
         """This is called (from a separate thread) for each audio block."""

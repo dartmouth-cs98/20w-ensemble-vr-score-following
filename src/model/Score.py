@@ -10,6 +10,7 @@ class ScoreFactory():
         if title == Pieces.Twinkle:
             return TwinkleTwinkleScore()
 
+
 class Pieces(Enum):
     Twinkle = "Twinkle Twinkle Little Star"
     Pachabels = "Pachabels Canon"
@@ -47,7 +48,7 @@ class TwinkleTwinkleScore(Score):
                       Note(Pitch.A, Duration.Quarter),
                       Note(Pitch.B, Duration.Quarter),
                       Note(Pitch.B, Duration.Quarter),
-                      Note(Pitch.A, Duration.Quarter), # Half
+                      Note(Pitch.A, Duration.Quarter),  # Half
                       Note(Pitch.A, Duration.Quarter),
                       Note(Pitch.G, Duration.Quarter),
                       Note(Pitch.G, Duration.Quarter),
@@ -60,4 +61,4 @@ class TwinkleTwinkleScore(Score):
         self.N = len(self.notes)
 
     def set_tempo(self):
-        self.tempo = 75
+        self.tempo = 65

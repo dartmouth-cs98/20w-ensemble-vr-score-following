@@ -1,6 +1,6 @@
 import os
+
 import numpy as np
-from scipy.stats import multivariate_normal
 from numpy.linalg import det, inv
 
 from src.model.Score import Pieces, ScoreFactory
@@ -8,9 +8,11 @@ from src.model.Score import Pieces, ScoreFactory
 
 class Model:
 
-    def __init__(self, audio_client, instrument="violin", piece=Pieces.Twinkle):
+    def __init__(self, audio_client, tempo=None, instrument="violin", piece=Pieces.Twinkle):
         self.piece = piece
         self.score = ScoreFactory.get_score(piece)
+        if tempo != None:
+            self.score.tempo = tempo
         self.L = 2
         self.N = self.score.N
         self.audio_client = audio_client
@@ -86,7 +88,7 @@ class Model:
         """
 
         for i, note in enumerate(self.score.notes):
-            num_beats = note.duration.value / 4
+            num_beats = note.duration.value
 
             fpb = self.get_frames_per_beat(self.score.tempo, self.audio_client.sample_rate, self.audio_client.blocksize)
             self.a[i, 0, i, 0] = 1 - 1 / (fpb * num_beats)
@@ -157,17 +159,15 @@ class Model:
         :return:
         """
         if i == self.N or l == 1:
-            # pdf = multivariate_normal.pdf(y_t, self.mu["-1"], self.Sigma["-1"])
-            pdf = self.mvnormpdf(y_t, self.mu["-1"], self.Sigma["-1"], "-1")
-            return 0.9999 if pdf > 10 else pdf
+            pdf = self.multivariate_norm_pdf(y_t, self.mu["-1"], self.Sigma["-1"], "-1")
+            return 0.9999 if pdf > 1 else pdf
         elif l == 0:
             prob = 0
             p_i = self.score.notes[i].pitch.value[0]
             for k in self.K:
                 w = self.get_weight(int(k), p_i)
-                # pdf = multivariate_normal.pdf(y_t, self.mu[k], self.Sigma[k])
-                pdf = self.mvnormpdf(y_t, self.mu[k], self.Sigma[k], k)
-                if pdf > 10:
+                pdf = self.multivariate_norm_pdf(y_t, self.mu[k], self.Sigma[k], k)
+                if pdf > 1:
                     pdf = 0.999
                 prob += w * pdf
             return prob
@@ -193,10 +193,10 @@ class Model:
             return 0
 
     def get_frames_per_beat(self, bpm, sample_rate, block_size):
-        frames_per_minute = (sample_rate / block_size) * 60
-        return frames_per_minute / bpm
+        # frames_per_minute = (sample_rate / block_size) * 60
+        return self.audio_client.frames_per_min / bpm
 
-    def mvnormpdf(self, x, mu, sigma, pitch):
+    def multivariate_norm_pdf(self, x, mu, sigma, pitch):
         k = x.shape[-1]
         den = np.sqrt((2 * np.pi) ** k * self.inv_det[pitch][1])
         x = x - mu

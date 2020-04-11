@@ -7,7 +7,6 @@ import numpy as np
 from scipy.stats import multivariate_normal
 
 from src.model.Note import Pitch
-
 from src.client.AudioClient import AudioClient
 from src.service.ModelService import Model
 
@@ -31,11 +30,11 @@ if __name__ == "__main__":
                 pitch_sp = k
                 prob_sp = obs_prob_sp
 
-            obs_prob = model.mvnormpdf(obs, model.mu[str(k)], model.Sigma[str(k)], str(k))
+            obs_prob = model.multivariate_norm_pdf(obs, model.mu[str(k)], model.Sigma[str(k)], str(k))
             if obs_prob > prob:
                 pitch = k
                 prob = obs_prob
 
-        print(Pitch.__dict__["_member_names_"][pitch], Pitch.__dict__["_member_names_"][pitch_sp], t,
-              obs_prob - obs_prob_sp)
+        # print(Pitch.__dict__["_member_names_"][pitch], Pitch.__dict__["_member_names_"][pitch_sp], t,
+        #       obs_prob - obs_prob_sp)
         t += 1
