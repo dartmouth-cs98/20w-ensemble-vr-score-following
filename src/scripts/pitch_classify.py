@@ -1,12 +1,12 @@
 import sys
-
 sys.path.append('../../')
+
+from src.model.Note import Pitch
+from src.scripts.follow import RecordThread
 
 import numpy as np
 
 from scipy.stats import multivariate_normal
-
-from src.model.Note import Pitch
 
 from src.client.AudioClient import AudioClient
 from src.service.ModelService import Model
@@ -14,28 +14,51 @@ from src.service.ModelService import Model
 if __name__ == "__main__":
     audio_client = AudioClient()
     model = Model(audio_client)
+    live = True
 
-    t = 0
-    q = np.load("Twinkle_Recording.npy")[:, :]
+    if live:
+        record_thread = RecordThread(audio_client)
+        record_thread.start()
 
-    while t < len(q[0]):
-        obs = q[:, t]
-        pitch = -1
-        pitch_sp = -1
-        prob = 0
-        prob_sp = 0
+        i = 0
+        while True:
+            pitch = -1
+            pitch_sp = -1
+            prob = 0
+            prob_sp = 0
+            obs = audio_client.q.get().squeeze()
 
-        for k in range(-1, 12):
-            obs_prob_sp = multivariate_normal.pdf(obs, model.mu[str(k)], model.Sigma[str(k)])
-            if obs_prob_sp > prob_sp:
-                pitch_sp = k
-                prob_sp = obs_prob_sp
+            for k in range(-1, 12):
+                obs_prob = model.multivariate_norm_pdf(obs, model.mu[str(k)], str(k))
+                if obs_prob > prob:
+                    pitch = k
+                    prob = obs_prob
 
-            obs_prob = model.mvnormpdf(obs, model.mu[str(k)], model.Sigma[str(k)], str(k))
-            if obs_prob > prob:
-                pitch = k
-                prob = obs_prob
+            print(Pitch(pitch).name, i, prob)
+            i += 1
 
-        print(Pitch.__dict__["_member_names_"][pitch], Pitch.__dict__["_member_names_"][pitch_sp], t,
-              obs_prob - obs_prob_sp)
-        t += 1
+    else:
+
+        t = 0
+        q = np.load("../../res/data/Twinkle_Recording.npy")[:, 32:]
+
+        while t < len(q[0]):
+            obs = q[:, t]
+            pitch = -1
+            pitch_sp = -1
+            prob = 0
+            prob_sp = 0
+
+            for k in range(-1, 12):
+                obs_prob_sp = multivariate_normal.pdf(obs, model.mu[str(k)], model.Sigma[str(k)])
+                if obs_prob_sp > prob_sp:
+                    pitch_sp = k
+                    prob_sp = obs_prob_sp
+
+                obs_prob = model.multivariate_norm_pdf(obs, model.mu[str(k)], str(k))
+                if obs_prob > prob:
+                    pitch = k
+                    prob = obs_prob
+
+            print(Pitch(pitch).name, Pitch(pitch_sp).name, t, obs_prob - obs_prob_sp)
+            t += 1
