@@ -2,7 +2,7 @@ from enum import Enum
 from abc import abstractmethod
 import pretty_midi
 
-from src.model.Note import Note, Pitch, Duration
+from src.music.Note import Note, Pitch, Duration
 
 
 class ScoreFactory():

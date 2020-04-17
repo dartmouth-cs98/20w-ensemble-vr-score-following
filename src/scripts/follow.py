@@ -2,13 +2,16 @@ import threading
 import numpy as np
 import sys
 import time
+
+from src.service.tempo import KalmanFilter
+
 sys.path.append('../../')
 
-from src.model.Score import Pieces
+from src.music.Score import Pieces
 
-from src.client.AudioClient import AudioClient
-from src.service.ModelService import Model
-from src.service.AccompanimentService import AccompanimentService
+from src.interface.audio import AudioClient
+from src.service.model import Model
+from src.service.accompaniment import AccompanimentService
 
 
 class RecordThread(threading.Thread):
@@ -28,10 +31,13 @@ class RecordThread(threading.Thread):
 
 if __name__ == "__main__":
     audio_client = AudioClient()
-    model = Model(audio_client, piece=Pieces.Pachabels)
+    model = Model(audio_client, piece=Pieces.Twinkle)
     accompaniment = AccompanimentService(model.score)
-    live = True
+    tempo = KalmanFilter(model.score.tempo)
+
+    live = False
     timed = False
+
 
     if live:
         record_thread = RecordThread(audio_client)
@@ -57,7 +63,6 @@ if __name__ == "__main__":
                 note_event = current_state[0]
                 accompaniment.play_note(note_event)
 
-
     else:
         t = 0
         q = np.load("../../res/data/Twinkle_Recording.npy")[:, :]
@@ -68,5 +73,5 @@ if __name__ == "__main__":
             print(current_state, t, prob)
             t += 1
 
-            if t == 1:
+            if t == 89:
                 pass

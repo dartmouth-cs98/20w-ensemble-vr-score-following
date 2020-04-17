@@ -1,4 +1,4 @@
-from src.client.AudioClient import AudioClient
+from src.interface.audio import AudioClient
 import pickle
 import numpy as np
 

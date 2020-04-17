@@ -2,7 +2,7 @@ import sys
 import time
 import fluidsynth
 
-from src.model.Score import TwinkleTwinkleScore
+from src.music.Score import TwinkleTwinkleScore
 
 sys.path.append('../../')
 
