@@ -154,7 +154,7 @@ class Model:
             return 0.999 if pdf > 1 else pdf
         elif l == 0:
             prob = 0
-            p_i = self.score.notes[i].pitch.value
+            p_i = self.score.subdivided_notes[i].pitch.value
             for k in self.K:
                 w = self.get_weight(int(k), p_i)
                 pdf = self.multivariate_norm_pdf(y_t, self.mu[k], k)

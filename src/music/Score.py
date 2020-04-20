@@ -1,6 +1,7 @@
 from enum import Enum
 from abc import abstractmethod
 import pretty_midi
+from math import floor
 
 from src.music.Note import Note, Pitch, Duration
 
@@ -21,7 +22,7 @@ class Pieces(Enum):
 
 class Score():
     def __init__(self):
-        self.notes = None
+        self.subdivided_notes = None
         self.tempo = None
         self.title = ""
         self.accompaniment = None
@@ -39,6 +40,9 @@ class Score():
     def set_accompaniment(self):
         pass
 
+    def get_true_note_event(self, event):
+        return floor(event/4 - 0.25) + 1
+
     def get_accompaniment(self, event_num):
         return self.accompaniment[event_num]
 
@@ -54,40 +58,40 @@ class PachabelScore(Score):
         self.sub_beat = Duration.Eighth
 
     def set_notes(self):
-        self.notes = [Note(Pitch.REST, Duration.Eighth),
-                      Note(Pitch.F_SHARP_G_FLAT, Duration.Eighth),
-                      Note(Pitch.F_SHARP_G_FLAT, Duration.Eighth),
-                      Note(Pitch.F_SHARP_G_FLAT, Duration.Eighth),
-                      Note(Pitch.F_SHARP_G_FLAT, Duration.Eighth),
-                      Note(Pitch.E, Duration.Eighth),
-                      Note(Pitch.E, Duration.Eighth),
-                      Note(Pitch.E, Duration.Eighth),
-                      Note(Pitch.E, Duration.Eighth),
-                      Note(Pitch.D, Duration.Eighth),
-                      Note(Pitch.D, Duration.Eighth),
-                      Note(Pitch.D, Duration.Eighth),
-                      Note(Pitch.D, Duration.Eighth),
-                      Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
-                      Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
-                      Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
-                      Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
-                      Note(Pitch.B, Duration.Eighth),
-                      Note(Pitch.B, Duration.Eighth),
-                      Note(Pitch.B, Duration.Eighth),
-                      Note(Pitch.B, Duration.Eighth),
-                      Note(Pitch.A, Duration.Eighth),
-                      Note(Pitch.A, Duration.Eighth),
-                      Note(Pitch.A, Duration.Eighth),
-                      Note(Pitch.A, Duration.Eighth),
-                      Note(Pitch.B, Duration.Eighth),
-                      Note(Pitch.B, Duration.Eighth),
-                      Note(Pitch.B, Duration.Eighth),
-                      Note(Pitch.B, Duration.Eighth),
-                      Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
-                      Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
-                      Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
-                      Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth)]
-        self.N = len(self.notes)
+        self.subdivided_notes = [Note(Pitch.REST, Duration.Eighth),
+                                 Note(Pitch.F_SHARP_G_FLAT, Duration.Eighth),
+                                 Note(Pitch.F_SHARP_G_FLAT, Duration.Eighth),
+                                 Note(Pitch.F_SHARP_G_FLAT, Duration.Eighth),
+                                 Note(Pitch.F_SHARP_G_FLAT, Duration.Eighth),
+                                 Note(Pitch.E, Duration.Eighth),
+                                 Note(Pitch.E, Duration.Eighth),
+                                 Note(Pitch.E, Duration.Eighth),
+                                 Note(Pitch.E, Duration.Eighth),
+                                 Note(Pitch.D, Duration.Eighth),
+                                 Note(Pitch.D, Duration.Eighth),
+                                 Note(Pitch.D, Duration.Eighth),
+                                 Note(Pitch.D, Duration.Eighth),
+                                 Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
+                                 Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
+                                 Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
+                                 Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
+                                 Note(Pitch.B, Duration.Eighth),
+                                 Note(Pitch.B, Duration.Eighth),
+                                 Note(Pitch.B, Duration.Eighth),
+                                 Note(Pitch.B, Duration.Eighth),
+                                 Note(Pitch.A, Duration.Eighth),
+                                 Note(Pitch.A, Duration.Eighth),
+                                 Note(Pitch.A, Duration.Eighth),
+                                 Note(Pitch.A, Duration.Eighth),
+                                 Note(Pitch.B, Duration.Eighth),
+                                 Note(Pitch.B, Duration.Eighth),
+                                 Note(Pitch.B, Duration.Eighth),
+                                 Note(Pitch.B, Duration.Eighth),
+                                 Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
+                                 Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
+                                 Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth),
+                                 Note(Pitch.C_SHARP_D_FLAT, Duration.Eighth)]
+        self.N = len(self.subdivided_notes)
 
     def set_accompaniment(self):
         accompaniment = ['', 'D3', 'A3', 'D4', 'F#4', 'A2', 'E3', 'A3', 'C#4',
@@ -113,24 +117,24 @@ class TwinkleTwinkleScore(Score):
 
     def set_notes(self):
         # self.notes = [2, 2, 9, 9, 11, 11, 9, 7, 7, 6, 6, 4, 4, 2]
-        self.notes = [Note(Pitch.REST, Duration.Quarter),
-                      Note(Pitch.D, Duration.Quarter),
-                      Note(Pitch.D, Duration.Quarter),
-                      Note(Pitch.A, Duration.Quarter),
-                      Note(Pitch.A, Duration.Quarter),
-                      Note(Pitch.B, Duration.Quarter),
-                      Note(Pitch.B, Duration.Quarter),
-                      Note(Pitch.A, Duration.Quarter),  # Half
-                      Note(Pitch.A, Duration.Quarter),
-                      Note(Pitch.G, Duration.Quarter),
-                      Note(Pitch.G, Duration.Quarter),
-                      Note(Pitch.F_SHARP_G_FLAT, Duration.Quarter),
-                      Note(Pitch.F_SHARP_G_FLAT, Duration.Quarter),
-                      Note(Pitch.E, Duration.Quarter),
-                      Note(Pitch.E, Duration.Quarter),
-                      Note(Pitch.D, Duration.Quarter),  # Half
-                      Note(Pitch.D, Duration.Quarter)]
-        self.N = len(self.notes)
+        self.subdivided_notes = [Note(Pitch.REST, Duration.Quarter),
+                                 Note(Pitch.D, Duration.Quarter),
+                                 Note(Pitch.D, Duration.Quarter),
+                                 Note(Pitch.A, Duration.Quarter),
+                                 Note(Pitch.A, Duration.Quarter),
+                                 Note(Pitch.B, Duration.Quarter),
+                                 Note(Pitch.B, Duration.Quarter),
+                                 Note(Pitch.A, Duration.Quarter),  # Half
+                                 Note(Pitch.A, Duration.Quarter),
+                                 Note(Pitch.G, Duration.Quarter),
+                                 Note(Pitch.G, Duration.Quarter),
+                                 Note(Pitch.F_SHARP_G_FLAT, Duration.Quarter),
+                                 Note(Pitch.F_SHARP_G_FLAT, Duration.Quarter),
+                                 Note(Pitch.E, Duration.Quarter),
+                                 Note(Pitch.E, Duration.Quarter),
+                                 Note(Pitch.D, Duration.Quarter),  # Half
+                                 Note(Pitch.D, Duration.Quarter)]
+        self.N = len(self.subdivided_notes)
 
     def set_tempo(self):
         self.tempo = 60
