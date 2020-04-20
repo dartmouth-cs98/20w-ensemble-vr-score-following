@@ -19,9 +19,6 @@ class MidiClient:
         pass
 
 
-    def estimate_parameters(self):
-        pass
-
 
 client = MidiClient()
 client.load_file('../../res/Dataset/01_Jupiter_vn_vc/Sco_01_Jupiter_vn_vc.mid')

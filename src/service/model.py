@@ -1,10 +1,8 @@
 import os
-
 import numpy as np
 from numpy.linalg import det, inv
-
 from src.common.calculations import MathHelper
-from src.model.Score import Pieces, ScoreFactory
+from src.music.Score import Pieces, ScoreFactory
 
 
 class Model:
@@ -90,10 +88,8 @@ class Model:
         :return:
         """
 
-        for i, note in enumerate(self.score.notes):
-            self.a[i, 0, i, 0] = self.math_helper.bpm_to_prob(self.score.tempo, beat_value=self.score.sub_beat.value,
+        self.a[:, 0, :, 0] = self.math_helper.bpm_to_prob(self.score.tempo, beat_value=self.score.sub_beat.value,
                                                               recording_speed=570)
-
         self.a[self.N, 0, self.N, 0] = 0.996
 
     def initialize_transition_matrix(self):
@@ -158,7 +154,7 @@ class Model:
             return 0.999 if pdf > 1 else pdf
         elif l == 0:
             prob = 0
-            p_i = self.score.notes[i].pitch.value
+            p_i = self.score.subdivided_notes[i].pitch.value
             for k in self.K:
                 w = self.get_weight(int(k), p_i)
                 pdf = self.multivariate_norm_pdf(y_t, self.mu[k], k)
@@ -212,9 +208,11 @@ class Model:
 
                 for l in range(self.L):
                     if i < self.N:
-                        new_alpha[i, l] = self.b(obs, i, l) * (
-                                np.sum(self.alpha[i + nbh:i + 1, :] * self.a[i + nbh:i + 1, :, i, l])
-                                + np.sum(self.alpha[self.N, :] * self.a[self.N, :, i, l]))
+                        trans_prob = np.sum(self.alpha[i + nbh:i + 1, :] * self.a[i + nbh:i + 1, :, i, l])
+                        obs_prob = self.b(obs, i, l)
+                        stop_state_prob = np.sum(self.alpha[self.N, :] * self.a[self.N, :, i, l])
+                        new_alpha[i, l] = obs_prob * (trans_prob + stop_state_prob)
+
                     elif i == self.N:
                         new_alpha[i, l] = self.b(obs, i, 0) * (np.sum(self.alpha[self.N, :] * self.a[:, :, self.N, l]))
 

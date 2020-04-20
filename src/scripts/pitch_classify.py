@@ -1,15 +1,16 @@
 import sys
+
 sys.path.append('../../')
 
-from src.model.Note import Pitch
+from src.music.Note import Pitch
 from src.scripts.follow import RecordThread
 
 import numpy as np
 
 from scipy.stats import multivariate_normal
 
-from src.client.AudioClient import AudioClient
-from src.service.ModelService import Model
+from src.interface.audio import AudioClient
+from src.service.model import Model
 
 if __name__ == "__main__":
     audio_client = AudioClient()

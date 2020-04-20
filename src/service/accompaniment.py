@@ -2,7 +2,7 @@ import sys
 import time
 import fluidsynth
 
-from src.model.Score import TwinkleTwinkleScore
+from src.music.Score import TwinkleTwinkleScore
 
 sys.path.append('../../')
 
@@ -19,7 +19,7 @@ class AccompanimentService:
         self.previous_event = None
 
     def play_note(self, event):
-        if event == len(self.score.notes):
+        if event == len(self.score.subdivided_notes):
             return
 
         if self.previous_event != event:
