@@ -2,7 +2,7 @@ import os
 import numpy as np
 from numpy.linalg import det, inv
 from src.common.calculations import MathHelper
-from src.music.Score import Pieces, ScoreFactory
+from src.music.score import Pieces, ScoreFactory
 
 
 class Model:

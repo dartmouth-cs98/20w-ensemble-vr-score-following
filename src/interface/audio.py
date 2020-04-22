@@ -35,7 +35,7 @@ class AudioClient:
         data = indata.copy().squeeze()
         cqt = librosa.feature.chroma_cqt(y=data, sr=self.sample_rate)
         cqt = np.mean(cqt, axis=1).reshape((cqt.shape[0], 1))
-        self.q.put(cqt)
+        self.q.put(cqt.squeeze())
 
     def record(self, plot=False, time=0):
         stream = sd.InputStream(channels=1, callback=self.audio_callback, blocksize=self.blocksize,
