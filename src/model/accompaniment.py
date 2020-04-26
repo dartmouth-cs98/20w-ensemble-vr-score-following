@@ -2,7 +2,8 @@ import sys
 import time
 import fluidsynth
 
-from src.music.Score import TwinkleTwinkleScore
+from src.music.note import Pitch
+from src.music.score import TwinkleTwinkleScore
 
 sys.path.append('../../')
 
@@ -26,9 +27,8 @@ class AccompanimentService:
             self.current_notes.clear()
             self.previous_event = event
 
-
         note = self.score.get_accompaniment(event)
-        if note == '':
+        if note == Pitch.REST:
             return
 
         for playing_notes in self.current_notes:

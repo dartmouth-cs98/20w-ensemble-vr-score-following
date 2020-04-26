@@ -2,7 +2,7 @@ import sys
 
 sys.path.append('../../')
 
-from src.music.Note import Pitch
+from src.music.note import Pitch
 from src.scripts.follow import RecordThread
 
 import numpy as np
@@ -10,7 +10,7 @@ import numpy as np
 from scipy.stats import multivariate_normal
 
 from src.interface.audio import AudioClient
-from src.service.model import Model
+from src.model.model import Model
 
 if __name__ == "__main__":
     audio_client = AudioClient()
