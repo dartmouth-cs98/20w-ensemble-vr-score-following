@@ -13,7 +13,7 @@ class AudioClient:
     Class that handles input from microphone
     """
 
-    def __init__(self, sample_rate=44100, window=200, channels=[1], downsample=10, interval=30, blocksize=4096):
+    def __init__(self, sample_rate=44100, window=200, channels=[1], downsample=10, interval=30, blocksize=2048):
         self.sample_rate = sample_rate
         self.window = window
         self.channels = channels

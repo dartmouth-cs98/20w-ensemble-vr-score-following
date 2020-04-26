@@ -148,6 +148,7 @@ class PachabelScore(Score):
 
     def set_notes(self):
         self.subdivided_notes = [Note(Pitch.REST, Duration(0.5)),
+                                 Note(Pitch.REST, Duration(0.5)),
                                  Note(Pitch.F_SHARP_G_FLAT, Duration(0.5)),
                                  Note(Pitch.F_SHARP_G_FLAT, Duration(0.5)),
                                  Note(Pitch.F_SHARP_G_FLAT, Duration(0.5)),
@@ -183,7 +184,7 @@ class PachabelScore(Score):
         self.N = len(self.subdivided_notes)
 
     def set_accompaniment(self):
-        accompaniment = ['', 'D3', 'A3', 'D4', 'F#4', 'A2', 'E3', 'A3', 'C#4',
+        accompaniment = ['', '', 'D3', 'A3', 'D4', 'F#4', 'A2', 'E3', 'A3', 'C#4',
                          'B2', 'F#4', 'B3', 'D4', 'F#2', 'C#3', 'F#3', 'A3',
                          'G2', 'D3', 'G3', 'B3', 'D2', 'A2', 'D3', 'F#3',
                          'G2', 'D3', 'G3', 'B3', 'A2', 'E3', 'A3', 'C#4']

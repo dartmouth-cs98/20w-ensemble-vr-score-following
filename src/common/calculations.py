@@ -36,3 +36,10 @@ class MathHelper:
         desired_fpb = recording_speed/(desired_bpm)  * (beat_value)
         system_tempo = MathHelper.fpb_to_tempo(desired_fpb, *self.args)
         return 1 - (system_tempo / recording_speed)
+
+    @staticmethod
+    def multivariate_norm_pdf(x, mu, det, inv):
+        k = x.shape[-1]
+        den = np.sqrt((2 * np.pi) ** k * det)
+        np.subtract(x, mu, x)
+        return np.squeeze(np.exp(-x[..., None, :] @ inv @ x[..., None] / 2)) / den
