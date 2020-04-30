@@ -7,7 +7,7 @@ sys.path.append('../../')
 import os
 import numpy as np
 from numpy.linalg import det, inv
-from src.common.calculations import MathHelper
+from src.utils.calculations import MathHelper
 from src.music.score import Pieces, ScoreFactory
 
 
@@ -23,14 +23,14 @@ class Model:
 
         self.NUM_PITCHES = 13
 
-        # self.audio_client = audio_client
+        self.audio_client = audio_client
         self.math_helper = MathHelper()
 
         self.a = np.zeros((self.N + 1, self.L, self.N + 1, self.L))  # transition matrix
         self.pi = np.zeros((self.N + 1, self.L))  # initial probabilities matrix
         self.e = np.zeros((self.N + 1, self.L))  # exit probabilities matrix
 
-        # proability of pitch errors. Eq(17) Section IVB2.
+        # probability of pitch errors. Eq(17) Section IVB2.
         self.C = 1.0e-50
         # probability of entering break state, 1 * 10^{-x} for some positive x
         self.s = 1.0e-100
@@ -57,7 +57,7 @@ class Model:
         self.initialize_pitch_weights()
         self.initialize_indexers()
 
-        print("Model Initialized")
+        # print("Model Initialized")
 
     def initialize_overtones(self):
         """
@@ -126,7 +126,8 @@ class Model:
         """
         pitches = [self.score.subdivided_notes[i].pitch.value for i in range(self.N)]
         pitches.append(Pitch.REST.value)  # break state
-        pause_state_w = np.array([[self._get_weight(k, Pitch.REST.value) for k in range(self.NUM_PITCHES)]] * (self.N + 1))
+        pause_state_w = np.array(
+            [[self._get_weight(k, Pitch.REST.value) for k in range(self.NUM_PITCHES)]] * (self.N + 1))
         zero_state_w = np.array([[self._get_weight(k, p_i) for k in range(self.NUM_PITCHES)] for p_i in pitches])
 
         if self.L == 1:
@@ -141,8 +142,8 @@ class Model:
         """
 
         self.a[:, 0, :, 0] = self.math_helper.bpm_to_prob(self.score.tempo, beat_value=self.score.sub_beat.value,
-                                                          recording_speed=1140)
-        self.a[self.N, 0, self.N, 0] = self.a[0,0,0,0]
+                                                          recording_speed=1000)
+        self.a[self.N, 0, self.N, 0] = 0.996
 
     def initialize_transition_matrix(self):
         """
@@ -185,7 +186,7 @@ class Model:
         """
         self.pi[:, 0] = 1
         self.pi[:, 1:] = 0
-        self.pi[self.N, 0] = 0
+        self.pi[self.N, 0] = 1
 
     def initialize_exit_probabilities(self, i):
         """
@@ -306,7 +307,7 @@ class Model:
             # calculate probability of making transition and probability of going through the break state
             trans_prob = np.sum(np.stack([alpha_full] * self.L, axis=3) * a_full, axis=(1, 2))
             trans_pause = np.sum((np.stack([pause_state_alpha] * self.L, axis=2) * pause_state_a), axis=(0, 1))
-            stop_state_prob = np.stack([np.sum(self.alpha[self.N, :] * self.a[self.N, :, 5, :], axis=1)] * (self.N + 1))
+            stop_state_prob = np.stack([np.sum(self.alpha[self.N, :] * self.a[self.N, :, 0, :], axis=1)] * (self.N + 1))
             trans_prob += stop_state_prob
             trans_prob[self.N, :] = trans_pause
 

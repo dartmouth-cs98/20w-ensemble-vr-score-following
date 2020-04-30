@@ -28,7 +28,7 @@ class AccompanimentService:
             self.previous_event = event
 
         note = self.score.get_accompaniment(event)
-        if note == Pitch.REST:
+        if note == '':
             return
 
         for playing_notes in self.current_notes:

@@ -98,7 +98,9 @@ class ScoreFactory():
         elif title == Pieces.Pachabels:
             return PachabelScore()
         else:
-            return ScoreBuilder('../../res/midi/Pachabels/Pachelbels_Canon_in_D_String_Quartet.mid', Duration(0.25)).build()
+            return ScoreBuilder('../../res/midi/Pachabels/Pachelbels_Canon_in_D_String_Quartet.mid',
+                                Duration(0.25)).build()
+
 
 class Pieces(Enum):
     Twinkle = "Twinkle Twinkle Little Star"
@@ -147,7 +149,8 @@ class PachabelScore(Score):
         self.sub_beat = Duration(0.5)
 
     def set_notes(self):
-        self.subdivided_notes = [Note(Pitch.REST, Duration(0.5)),
+        self.subdivided_notes = [Note(Pitch.D, Duration(0.5)),  # Bullshit Note
+                                 Note(Pitch.REST, Duration(0.5)),
                                  Note(Pitch.REST, Duration(0.5)),
                                  Note(Pitch.F_SHARP_G_FLAT, Duration(0.5)),
                                  Note(Pitch.F_SHARP_G_FLAT, Duration(0.5)),
@@ -184,7 +187,7 @@ class PachabelScore(Score):
         self.N = len(self.subdivided_notes)
 
     def set_accompaniment(self):
-        accompaniment = ['', '', 'D3', 'A3', 'D4', 'F#4', 'A2', 'E3', 'A3', 'C#4',
+        accompaniment = ['', 'A3', 'C#4c', 'D3', 'A3', 'D4', 'F#4', 'A2', 'E3', 'A3', 'C#4',
                          'B2', 'F#4', 'B3', 'D4', 'F#2', 'C#3', 'F#3', 'A3',
                          'G2', 'D3', 'G3', 'B3', 'D2', 'A2', 'D3', 'F#3',
                          'G2', 'D3', 'G3', 'B3', 'A2', 'E3', 'A3', 'C#4']
@@ -206,23 +209,24 @@ class TwinkleTwinkleScore(Score):
 
     def set_notes(self):
         # self.notes = [2, 2, 9, 9, 11, 11, 9, 7, 7, 6, 6, 4, 4, 2]
-        self.subdivided_notes = [Note(Pitch.REST, Duration(1.0)),
-                                 Note(Pitch.D, Duration(1.0)),
-                                 Note(Pitch.D, Duration(1.0)),
-                                 Note(Pitch.A, Duration(1.0)),
-                                 Note(Pitch.A, Duration(1.0)),
-                                 Note(Pitch.B, Duration(1.0)),
-                                 Note(Pitch.B, Duration(1.0)),
-                                 Note(Pitch.A, Duration(1.0)),  # Half
-                                 Note(Pitch.A, Duration(1.0)),
-                                 Note(Pitch.G, Duration(1.0)),
-                                 Note(Pitch.G, Duration(1.0)),
-                                 Note(Pitch.F_SHARP_G_FLAT, Duration(1.0)),
-                                 Note(Pitch.F_SHARP_G_FLAT, Duration(1.0)),
-                                 Note(Pitch.E, Duration(1.0)),
-                                 Note(Pitch.E, Duration(1.0)),
-                                 Note(Pitch.D, Duration(1.0)),  # Half
-                                 Note(Pitch.D, Duration(1.0))]
+        self.subdivided_notes = [
+            Note(Pitch.REST, Duration(1.0)),
+            Note(Pitch.D, Duration(1.0)),
+            Note(Pitch.D, Duration(1.0)),
+            Note(Pitch.A, Duration(1.0)),
+            Note(Pitch.A, Duration(1.0)),
+            Note(Pitch.B, Duration(1.0)),
+            Note(Pitch.B, Duration(1.0)),
+            Note(Pitch.A, Duration(1.0)),  # Half
+            Note(Pitch.A, Duration(1.0)),
+            Note(Pitch.G, Duration(1.0)),
+            Note(Pitch.G, Duration(1.0)),
+            Note(Pitch.F_SHARP_G_FLAT, Duration(1.0)),
+            Note(Pitch.F_SHARP_G_FLAT, Duration(1.0)),
+            Note(Pitch.E, Duration(1.0)),
+            Note(Pitch.E, Duration(1.0)),
+            Note(Pitch.D, Duration(1.0)),  # Half
+            Note(Pitch.D, Duration(1.0))]
         self.N = len(self.subdivided_notes)
 
     def set_tempo(self):

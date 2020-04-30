@@ -5,7 +5,7 @@ import time
 
 sys.path.append('../../')
 
-from src.common.calculations import MathHelper
+from src.utils.calculations import MathHelper
 from src.model.tempo import KalmanFilter
 
 from src.music.score import Pieces
@@ -27,14 +27,14 @@ class RecordThread(threading.Thread):
 
         if self.save:
             recording = np.concatenate(self.audio_client.q, axis=1)
-            np.save("Twinkle_Recording", recording)
+            np.save("Pachabels_Recording", recording)
 
 
 if __name__ == "__main__":
 
     audio_client = AudioClient()
     model = Model(audio_client, piece=Pieces.Pachabels, tempo=60)
-    # accompaniment = AccompanimentService(model.score)
+    accompaniment = AccompanimentService(model.score)
     tempo = KalmanFilter(model.score.tempo)
     math_helper = MathHelper()
 
@@ -63,10 +63,15 @@ if __name__ == "__main__":
 
             else:
                 while True:
-                    obs = audio_client.q.get()
+                    if i == 0:
+                        obs = model.mu["2"]     # Bullshit note to set alpha correctly.
+                    else:
+                        obs = audio_client.q.get()
                     current_state, prob = model.next_observation(obs)
                     i += 1
-                    print(current_state, np.squeeze(model.alpha), duration, tempo.current_estimate)
+                    print(current_state, prob, duration, tempo.current_estimate)
+                    if prob < 1.0e-110:
+                        model.alpha *= 1.0e100
 
                     # # get true event of current state, i.e. the half note when sub-beat is eighth.
                     # played_note_val = model.score.get_true_note_event(current_state[0])
@@ -99,8 +104,8 @@ if __name__ == "__main__":
                     #     prev_state = current_state[0]
                     #     prev_note_val = played_note_val
 
-                    # note_event = current_state[0]
-                    # accompaniment.play_note(note_event)
+                    note_event = current_state[0]
+                    accompaniment.play_note(note_event)
 
         else:
             t = 0
