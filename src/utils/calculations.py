@@ -33,7 +33,7 @@ class MathHelper:
         return a * np.exp(-c * (x - b)) + d
 
     def bpm_to_prob(self, desired_bpm, beat_value, recording_speed=570):
-        desired_fpb = recording_speed/(desired_bpm)  * (beat_value)
+        desired_fpb = recording_speed/(desired_bpm)  * (beat_value / 2)
         system_tempo = MathHelper.fpb_to_tempo(desired_fpb, *self.args)
         return 1 - (system_tempo / recording_speed)
 
