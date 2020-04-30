@@ -1,5 +1,12 @@
-# 20w-ensemble-vr-score-following
-Score following algorithms component for ensemble
+# 20W Ensemble-VR Score-Following
+
+This repository contains the score-following component of Ensemble-VR
+
+## How to Use
+
+## Tech Used
+
+## Credits
 
 # Training Model
 * While taking a deeper look into the details of the HSMM algorithm provided by Nakamura, et. al. (2015), we found that
