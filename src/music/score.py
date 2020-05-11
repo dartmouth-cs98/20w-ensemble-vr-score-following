@@ -4,7 +4,6 @@ sys.path.append('../../')
 from enum import Enum
 from abc import abstractmethod
 import pretty_midi
-from math import floor
 from src.interface.midi import MidiClient
 
 from src.music.note import Note, Pitch, Duration
@@ -19,12 +18,13 @@ class ScoreBuilder():
         self.sub_beat = sub_beat
         self.parts = [
             self.midi_client.parse_track(i, is_solo=False) if i != 0 else self.midi_client.parse_track(i)
-            for i in range(len(self.midi_client.midi_file.tracks) - 2)
+            for i in range(len(self.midi_client.midi_file.tracks))
         ]
         self.subdivided_parts = [self._subdivide_track(part, sub_beat) for part in self.parts]
         self._ensure_length()
         self.add_solo()
         self.add_accompaniment()
+        self.add_filler_note()
         self.create_subdivision_mapping(self.parts[0])
 
     def _ensure_length(self):
@@ -70,11 +70,18 @@ class ScoreBuilder():
 
         self.product.accompaniment = accompaniment
 
+    def add_filler_note(self):
+        pitch = Pitch.D if self.product.notes[0].pitch == Pitch.REST else Pitch.REST
+        self.product.notes.insert(0, Note(pitch, self.sub_beat.value))
+        self.product.subdivided_notes.insert(0, Note(pitch, self.sub_beat.value))
+        self.product.accompaniment.insert(0, {Note(Pitch.REST, self.sub_beat.value)})
+
+
     def _subdivide_track(self, notes, sub_beat):
         subdivided_track = []
         for note in notes:
             num_subdivisions = note.duration / sub_beat.value
-            subdivided_note = [Note(note.pitch, sub_beat)] * int(num_subdivisions)
+            subdivided_note = [Note(note.pitch, sub_beat) for i in range(int(num_subdivisions))]
             subdivided_note[0].is_note_start = True
             subdivided_note[len(subdivided_note) - 1].is_note_end = True
 
@@ -98,7 +105,7 @@ class ScoreFactory():
         elif title == Pieces.Pachabels:
             return PachabelScore()
         else:
-            return ScoreBuilder('../../res/midi/Pachabels/Pachelbels_Canon_in_D_String_Quartet.mid',
+            return ScoreBuilder('../../res/midi/Pachabels/short_pachabels.mid',
                                 Duration(0.25)).build()
 
 
@@ -187,11 +194,11 @@ class PachabelScore(Score):
         self.N = len(self.subdivided_notes)
 
     def set_accompaniment(self):
-        accompaniment = ['', 'A3', 'C#4c', 'D3', 'A3', 'D4', 'F#4', 'A2', 'E3', 'A3', 'C#4',
+        accompaniment = ['', 'A3', 'C#4', 'D3', 'A3', 'D4', 'F#4', 'A2', 'E3', 'A3', 'C#4',
                          'B2', 'F#4', 'B3', 'D4', 'F#2', 'C#3', 'F#3', 'A3',
                          'G2', 'D3', 'G3', 'B3', 'D2', 'A2', 'D3', 'F#3',
                          'G2', 'D3', 'G3', 'B3', 'A2', 'E3', 'A3', 'C#4']
-        self.accompaniment = [pretty_midi.note_name_to_number(note) if note != '' else '' for note in accompaniment]
+        self.accompaniment = [{pretty_midi.note_name_to_number(note)} if note != '' else '' for note in accompaniment]
 
     def set_tempo(self):
         self.tempo = 60
@@ -235,7 +242,7 @@ class TwinkleTwinkleScore(Score):
     def set_accompaniment(self):
         accompaniment = ['', 'A3', 'A3', 'F#4', 'F#4', 'G4', 'G4', 'F#4', 'F#4', 'E4', 'E4', 'D4', 'D4', 'A3', 'C#4',
                          'D4', 'D4']
-        self.accompaniment = [pretty_midi.note_name_to_number(note) if note != '' else '' for note in accompaniment]
+        self.accompaniment = [{pretty_midi.note_name_to_number(note)} if note != '' else '' for note in accompaniment]
 
     def get_accompaniment(self, event_num):
         return self.accompaniment[event_num]

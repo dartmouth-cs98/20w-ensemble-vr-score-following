@@ -58,3 +58,9 @@ class Duration:
 
     def __init__(self, duration):
         self.value = float(duration)
+
+    def __str__(self):
+        return "<{0}>".format(self.value)
+
+    def __repr__(self):
+        return self.__str__()

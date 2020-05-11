@@ -6,8 +6,9 @@ from src.music.note import Note, Duration, Pitch
 
 class MidiClient:
 
-    def __init__(self):
+    def __init__(self, beats_per_measure=4):
         self.midi_file = None
+        self.beats_per_measure = beats_per_measure
         pass
 
     def load_file(self, filename):
@@ -43,14 +44,10 @@ class MidiClient:
                         pitch = event.pitch
 
                 num_beats = round(delta_time.time / self.midi_file.ticksPerQuarterNote, 2)
-                while num_beats > 4:
+                while num_beats > 4:        # while num beats is greater than beats left in bar.
                     notes.append(Note(pitch, Duration(4).value))
                     num_beats -= 4
 
                 if num_beats > 0:
                     notes.append(Note(pitch, Duration(num_beats).value))
         return notes
-
-# client = MidiClient()
-# client.load_file('../../res/midi/Pachabels/Pachelbels_Canon_in_D_String_Quartet.mid')
-# client.parse_track(4)

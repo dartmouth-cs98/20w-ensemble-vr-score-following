@@ -27,14 +27,15 @@ class AccompanimentService:
             self.current_notes.clear()
             self.previous_event = event
 
-        note = self.score.get_accompaniment(event)
-        if note == '':
+        notes = self.score.get_accompaniment(event)
+        if len(notes) == 0:
             return
 
         for playing_notes in self.current_notes:
-            if playing_notes != note:
-                self.fs.noteoff(0, playing_notes)
+            if playing_notes not in notes:
+                self.fs.noteoff(0, playing_notes.pitch)
 
-        if note not in self.current_notes:
-            self.fs.noteon(0, note, 100)
-            self.current_notes.add(note)
+        for note in notes:
+            if note not in self.current_notes and note.pitch != Pitch.REST and note.is_note_start:
+                self.fs.noteon(0, note.pitch, 100)
+                self.current_notes.add(note)
