@@ -25,7 +25,7 @@ class AudioClient:
         self.lines = None
         self.plotdata = None
         self.continue_recording = True
-        self.frames_per_min = 570
+        self.frames_per_min = 1350
 
     def audio_callback(self, indata, frames, time, status):
         """This is called (from a separate thread) for each audio block."""

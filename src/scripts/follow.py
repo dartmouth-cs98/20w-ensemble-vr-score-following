@@ -33,7 +33,7 @@ class RecordThread(threading.Thread):
 if __name__ == "__main__":
 
     audio_client = AudioClient()
-    model = Model(audio_client, piece=Pieces.Pachabels, tempo=60)
+    model = Model(audio_client, piece="ASDF", tempo=60)
     accompaniment = AccompanimentService(model.score)
     tempo = KalmanFilter(model.score.tempo)
     math_helper = MathHelper()
@@ -64,48 +64,55 @@ if __name__ == "__main__":
             else:
                 while True:
                     if i == 0:
-                        obs = model.mu["2"]     # Bullshit note to set alpha correctly.
+                        obs = model.mu["2"]  # Bullshit note to set alpha correctly.
                     else:
                         obs = audio_client.q.get()
                     current_state, prob = model.next_observation(obs)
                     i += 1
                     print(current_state, prob, duration, tempo.current_estimate)
+
+                    # reset probabilities
                     if prob < 1.0e-110:
                         model.alpha *= 1.0e100
 
-                    # # get true event of current state, i.e. the half note when sub-beat is eighth.
-                    # played_note_val = model.score.get_true_note_event(current_state[0])
-                    # if prev_state is None:
-                    #     prev_state = current_state[0]
-                    #     prev_note_val = model.score.get_true_note_event(prev_state)
-                    #     continue
-                    # else:
-                    #     prev_note_val = model.score.get_true_note_event(prev_state)
-                    #
-                    # print(current_state, prob, duration, tempo.current_estimate)
-                    #
-                    # if played_note_val == prev_note_val:
-                    #     duration += 1
-                    # else:
-                    #     if current_state[0] > 1 and current_state[0] != model.score.N and duration > 0:
-                    #         # calculate how many frames per beat were observed in the last note
-                    #         observed_fpb = duration * (1 / model.score.sub_beat.value) * (
-                    #                     model.score.sub_beat.value / model.score.notes[prev_note_val].duration.value)   # This might be one off.
-                    #         observed_tempo = audio_client.frames_per_min / observed_fpb
-                    #         print("Observed Tempo: ", observed_tempo)
-                    #
-                    #         # perform kalman filter update.
-                    #         tempo.next_measurement(observed_tempo)
-                    #         if abs(tempo.current_estimate - model.score.tempo) > 5:
-                    #             model.score.tempo = tempo.current_estimate
-                    #             model.initialize_transition_matrix()
-                    #
-                    #     duration = 0
-                    #     prev_state = current_state[0]
-                    #     prev_note_val = played_note_val
+                    # Play Accompaniment
+                    if prev_state is not None and current_state[0] - prev_state <= 2 and current_state[0] - prev_state >= 0:
+                        note_event = current_state[0]
+                        accompaniment.play_note(note_event)
 
-                    note_event = current_state[0]
-                    accompaniment.play_note(note_event)
+                    # get true event of current state, i.e. the half note when sub-beat is eighth.
+                    played_note_val = model.score.get_true_note_event(current_state[0])
+                    if prev_state is None:
+                        prev_state = current_state[0]
+                        prev_note_val = model.score.get_true_note_event(prev_state)
+                        continue
+                    else:
+                        prev_note_val = model.score.get_true_note_event(prev_state)
+
+                    if played_note_val == prev_note_val:
+                        duration += 1
+                        prev_state = current_state[0]
+                    else:
+                        if current_state[0] > 1 and current_state[0] != model.score.N and duration > 0:
+                            # calculate how many frames per beat were observed in the last note
+                            prev_expected_duration = model.score.notes[prev_note_val].duration if type(
+                                model.score.notes[prev_note_val - 1].duration) is int else model.score.notes[
+                                prev_note_val - 1].duration
+                            observed_fpb = (duration) * (1 / model.score.sub_beat.value) * (
+                                    model.score.sub_beat.value / prev_expected_duration)  # This might be one off.
+                            observed_tempo = audio_client.frames_per_min / observed_fpb
+                            print("Observed Tempo: ", observed_tempo)
+
+                            # perform kalman filter update.
+                            if abs(observed_tempo - model.score.tempo) < 20:
+                                tempo.next_measurement(observed_tempo)
+                                if abs(tempo.current_estimate - model.score.tempo) > 5 and abs(tempo.current_estimate - model.score.tempo) < 60:
+                                    model.score.tempo = tempo.current_estimate
+                                    model.update_tempo()
+
+                        duration = 0
+                        prev_state = current_state[0]
+                        prev_note_val = played_note_val
 
         else:
             t = 0
