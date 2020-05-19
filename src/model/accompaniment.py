@@ -19,7 +19,7 @@ class AccompanimentService:
         self.current_notes = set()
         self.previous_event = None
 
-    def play_note(self, event):
+    def play_accompaniment(self, event):
         if event == len(self.score.subdivided_notes):
             return
 

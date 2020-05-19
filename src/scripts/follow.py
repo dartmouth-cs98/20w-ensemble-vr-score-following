@@ -78,7 +78,7 @@ if __name__ == "__main__":
                     # Play Accompaniment
                     if prev_state is not None and current_state[0] - prev_state <= 2 and current_state[0] - prev_state >= 0:
                         note_event = current_state[0]
-                        accompaniment.play_note(note_event)
+                        accompaniment.play_accompaniment(note_event)
 
                     # get true event of current state, i.e. the half note when sub-beat is eighth.
                     played_note_val = model.score.get_true_note_event(current_state[0])
@@ -89,6 +89,7 @@ if __name__ == "__main__":
                     else:
                         prev_note_val = model.score.get_true_note_event(prev_state)
 
+                    # Have we moved onto the next note
                     if played_note_val == prev_note_val:
                         duration += 1
                         prev_state = current_state[0]
