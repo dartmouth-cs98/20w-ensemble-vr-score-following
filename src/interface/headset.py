@@ -8,7 +8,6 @@ from websockets import connect
 from src.music.note import Pitch
 from src.music.score import Pieces
 
-
 class HeadsetClient:
 
     def __init__(self, host, port):

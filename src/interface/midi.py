@@ -5,6 +5,9 @@ from src.music.note import Note, Duration, Pitch
 
 
 class MidiClient:
+    """
+    Class that loads and parses midi files into tracks
+    """
 
     def __init__(self, beats_per_measure=4):
         self.midi_file = None

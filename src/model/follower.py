@@ -2,6 +2,7 @@ import threading
 import numpy as np
 import sys
 import time
+import queue
 
 from src.interface.headset import HeadsetClient, MessageBuilder
 
@@ -30,8 +31,22 @@ class RecordThread(threading.Thread):
             recording = np.concatenate(self.audio_client.q, axis=1)
             np.save("Pachabels_Recording", recording)
 
+class HeadSetCommThread(threading.Thread):
+    def __init__(self, follower):
+        super().__init__()
+        self.follower = follower
+
+    def run(self):
+        while True:
+            message = self.follower.output_q.get()
+            self.follower.headset_client.send(message)
+
+
 
 class Follower:
+    """
+    Class that wraps together all the components needed to perform score following.
+    """
 
     def __init__(self):
         self.audio_client = AudioClient()
@@ -51,6 +66,7 @@ class Follower:
         self.with_headset = True
         if self.with_headset:
             self.headset_client = HeadsetClient("192.168.0.5", 4000)
+            self.output_q = queue.Queue()
 
     def _reset_probabilities(self, prob):
         """
@@ -105,8 +121,10 @@ class Follower:
             return self.audio_client.q.get()
 
     def _send_accompaniment_to_headset(self, current_state):
+        # TODO: take into account multiple notes in one accompaniment part.
+        # TODO: Put this into a different thread, add messages to a queue, send from queue.
         message = MessageBuilder.build_accompaniment_message(self.model.score.parts[:,current_state[0]])
-        self.headset_client.send(message)
+        self.output_q.put(message)
         pass
 
     def follow(self):
@@ -115,6 +133,10 @@ class Follower:
         try:
             record_thread = RecordThread(self.audio_client)
             record_thread.start()
+
+            if self.with_headset:
+                headset_thread = HeadSetCommThread(self)
+                headset_thread.start()
 
             i = 0
             while True:
