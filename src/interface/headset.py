@@ -43,7 +43,7 @@ class MessageBuilder:
     def build_accompaniment_message(notes):
         payload = {
             "type": MessageType.Accompaniment.value,
-            "data": {part: notes[part].pitch if notes[part].pitch != Pitch.REST else -1 for part in range(len(notes))}
+            "data": {part: [notes[part].pitch] if notes[part].pitch != Pitch.REST else -1 for part in range(len(notes))}
         }
         return payload
 

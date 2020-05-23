@@ -121,8 +121,6 @@ class Follower:
             return self.audio_client.q.get()
 
     def _send_accompaniment_to_headset(self, current_state):
-        # TODO: take into account multiple notes in one accompaniment part.
-        # TODO: Put this into a different thread, add messages to a queue, send from queue.
         message = MessageBuilder.build_accompaniment_message(self.model.score.parts[:,current_state[0]])
         self.output_q.put(message)
         pass
