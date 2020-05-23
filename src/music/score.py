@@ -3,6 +3,7 @@ import sys
 sys.path.append('../../')
 from enum import Enum
 from abc import abstractmethod
+import numpy as np
 import pretty_midi
 from src.interface.midi import MidiClient
 
@@ -63,6 +64,7 @@ class ScoreBuilder():
     def add_accompaniment(self):
         accompaniment = []
         parts = self.subdivided_parts[1:]
+        self.product.parts = np.array(parts)
 
         for i in range(len(parts[0])):
             notes_at_event = {parts[j][i] for j in range(len(parts))}
@@ -117,6 +119,7 @@ class Pieces(Enum):
 class Score():
     def __init__(self):
         self.subdivided_notes = None
+        self.parts = None
         self.notes = None
         self.tempo = None
         self.title = ""

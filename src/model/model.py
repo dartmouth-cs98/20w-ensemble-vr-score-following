@@ -1,3 +1,4 @@
+import logging
 import sys
 
 from src.music.note import Pitch
@@ -57,7 +58,7 @@ class Model:
         self.initialize_pitch_weights()
         self.initialize_indexers()
 
-        print("Model Initialized")
+        logging.info("Model Initialized")
 
     def initialize_overtones(self):
         """
