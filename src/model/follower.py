@@ -51,7 +51,7 @@ class Follower:
     def __init__(self):
         self.audio_client = AudioClient()
         self.model = Model(self.audio_client, piece="ASDF", tempo=60)
-        self.accompaniment = AccompanimentService(self.model.score)
+        #self.accompaniment = AccompanimentService(self.model.score)
         self.tempo = KalmanFilter(self.model.score.tempo)
         self.math_helper = MathHelper()
 
@@ -65,7 +65,7 @@ class Follower:
 
         self.with_headset = True
         if self.with_headset:
-            self.headset_client = HeadsetClient("192.168.0.5", 4000)
+            self.headset_client = HeadsetClient("10.0.1.68", 4000)
             self.output_q = queue.Queue()
 
     def _reset_probabilities(self, prob):
