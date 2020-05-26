@@ -49,9 +49,9 @@ class Follower:
     Class that wraps together all the components needed to perform score following.
     """
 
-    def __init__(self, with_headset: bool):
+    def __init__(self, with_headset: bool, piece: Pieces):
         self.audio_client = AudioClient()
-        self.model = Model(self.audio_client, piece="ASDF", tempo=60)
+        self.model = Model(self.audio_client, piece=piece, tempo=60)
         self.accompaniment = AccompanimentService(self.model.score)
         self.tempo = KalmanFilter(self.model.score.tempo)
         self.math_helper = MathHelper()
@@ -146,8 +146,6 @@ class Follower:
                 print(current_state, prob, self.duration, self.tempo.current_estimate)
                 i += 1
 
-                current_state = (720, 0)
-
                 self._reset_probabilities(prob)
                 if not self.with_headset:
                     self._play_accompaniment(current_state)
@@ -178,5 +176,5 @@ class Follower:
 
 
 if __name__ == "__main__":
-    follower = Follower()
+    follower = Follower(with_headset=False, piece=Pieces.ShortPachabels)
     follower.follow()

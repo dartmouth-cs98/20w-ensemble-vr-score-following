@@ -17,7 +17,7 @@ class Model:
     def __init__(self, audio_client, tempo=None, instrument="violin", piece=Pieces.Twinkle):
         self.piece = piece
         self.score = ScoreFactory.get_score(piece)
-        if tempo != None:
+        if tempo is not None:
             self.score.tempo = tempo
         self.L = 1
         self.N = self.score.N
