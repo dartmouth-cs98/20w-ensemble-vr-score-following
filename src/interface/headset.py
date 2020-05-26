@@ -9,6 +9,9 @@ from src.music.note import Pitch
 from src.music.score import Pieces
 
 class HeadsetClient:
+    """
+    Websocket client responsible for sending/receiving information from headset.
+    """
 
     def __init__(self, host, port):
         self.host = host
@@ -38,9 +41,17 @@ class HeadsetClient:
         print("Received: ", message)
 
 class MessageBuilder:
+    """
+    Helper class that helps send and parse information to and to and from the headset.
+    """
 
     @staticmethod
     def build_accompaniment_message(notes):
+        """
+        Build accompaniment message using pre-specified format
+        :param notes:
+        :return:
+        """
         payload = {
             "type": MessageType.Accompaniment.value,
             "data": {"inst" + str(part): notes[part].pitch if notes[part].pitch != Pitch.REST else -1 for part in range(len(notes))}
@@ -49,7 +60,11 @@ class MessageBuilder:
 
     @staticmethod
     def parse_message(message):
-
+        """
+        Parse information from incoming message
+        :param message:
+        :return:
+        """
         json_msg = json.loads(message)
         if json_msg["type"] == MessageType.ChoosePiece:
              if json_msg["data"]["name"] == Pieces.Pachabels:

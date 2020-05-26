@@ -37,7 +37,7 @@ class Server():
 if __name__== "__main__":
     logging.info("Starting Server....")
     server = Server()
-    start_server = websockets.serve(server.ws_handler, '10.0.1.68', 4000)
+    start_server = websockets.serve(server.ws_handler, '192.168.0.5', 4000)
     loop = asyncio.get_event_loop()
     loop.run_until_complete(start_server)
     logging.info("Started")

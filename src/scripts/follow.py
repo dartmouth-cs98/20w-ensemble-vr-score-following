@@ -33,7 +33,7 @@ class RecordThread(threading.Thread):
 if __name__ == "__main__":
 
     audio_client = AudioClient()
-    model = Model(audio_client, piece="ASDF", tempo=60)
+    model = Model(audio_client, piece=Pieces.ShortPachabels, tempo=60)
     accompaniment = AccompanimentService(model.score)
     tempo = KalmanFilter(model.score.tempo)
     math_helper = MathHelper()

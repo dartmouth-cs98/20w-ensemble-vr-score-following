@@ -5,6 +5,7 @@ import time
 import queue
 
 from src.interface.headset import HeadsetClient, MessageBuilder
+from src.music.note import Note, Pitch
 
 sys.path.append('../../')
 
@@ -31,6 +32,7 @@ class RecordThread(threading.Thread):
             recording = np.concatenate(self.audio_client.q, axis=1)
             np.save("Pachabels_Recording", recording)
 
+
 class HeadSetCommThread(threading.Thread):
     def __init__(self, follower):
         super().__init__()
@@ -42,30 +44,28 @@ class HeadSetCommThread(threading.Thread):
             self.follower.headset_client.send(message)
 
 
-
 class Follower:
     """
     Class that wraps together all the components needed to perform score following.
     """
 
-    def __init__(self):
+    def __init__(self, with_headset: bool):
         self.audio_client = AudioClient()
         self.model = Model(self.audio_client, piece="ASDF", tempo=60)
-        #self.accompaniment = AccompanimentService(self.model.score)
+        self.accompaniment = AccompanimentService(self.model.score)
         self.tempo = KalmanFilter(self.model.score.tempo)
         self.math_helper = MathHelper()
 
-
-        self.live = True
-        self.timed = False
+        # self.live = True
+        # self.timed = False
 
         self.prev_state = None
         self.prev_note_val = None
         self.duration = 1
 
-        self.with_headset = True
+        self.with_headset = with_headset
         if self.with_headset:
-            self.headset_client = HeadsetClient("10.0.1.68", 4000)
+            self.headset_client = HeadsetClient("192.168.0.5", 4000)
             self.output_q = queue.Queue()
 
     def _reset_probabilities(self, prob):
@@ -83,7 +83,8 @@ class Follower:
         :param current_state: state predicted by model
         :return: None
         """
-        if self.prev_state is not None and current_state[0] - self.prev_state <= 2 and current_state[0] - self.prev_state >= 0:
+        if self.prev_state is not None and current_state[0] - self.prev_state <= 2 and current_state[
+            0] - self.prev_state >= 0:
             note_event = current_state[0]
             self.accompaniment.play_accompaniment(note_event)
 
@@ -96,7 +97,8 @@ class Follower:
         # calculate how many frames per beat were observed in the last note
         if current_state[0] > 1 and current_state[0] != self.model.score.N and self.duration > 0:
             prev_expected_duration = self.model.score.notes[self.prev_note_val].duration if type(
-                self.model.score.notes[self.prev_note_val - 1].duration) is int else self.model.score.notes[self.prev_note_val - 1].duration
+                self.model.score.notes[self.prev_note_val - 1].duration) is int else self.model.score.notes[
+                self.prev_note_val - 1].duration
             observed_fpb = (self.duration) * (1 / prev_expected_duration)  # This might be one off.
             observed_tempo = self.audio_client.frames_per_min / observed_fpb
             print("Observed Tempo: ", observed_tempo)
@@ -121,7 +123,7 @@ class Follower:
             return self.audio_client.q.get()
 
     def _send_accompaniment_to_headset(self, current_state):
-        message = MessageBuilder.build_accompaniment_message(self.model.score.parts[:,current_state[0]])
+        message = MessageBuilder.build_accompaniment_message(self.model.score.parts[:, current_state[0]])
         self.output_q.put(message)
         pass
 
@@ -143,6 +145,8 @@ class Follower:
                 current_state, prob = self.model.next_observation(obs)
                 print(current_state, prob, self.duration, self.tempo.current_estimate)
                 i += 1
+
+                current_state = (720, 0)
 
                 self._reset_probabilities(prob)
                 if not self.with_headset:

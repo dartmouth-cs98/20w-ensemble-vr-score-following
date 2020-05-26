@@ -77,7 +77,7 @@ class ScoreBuilder():
         self.product.notes.insert(0, Note(pitch, self.sub_beat.value))
         self.product.subdivided_notes.insert(0, Note(pitch, self.sub_beat.value))
         self.product.accompaniment.insert(0, {Note(Pitch.REST, self.sub_beat.value)})
-
+        self.product.parts = np.hstack((np.array([[Note(Pitch.REST, self.sub_beat.value)]] * self.product.parts.shape[0]), self.product.parts))
 
     def _subdivide_track(self, notes, sub_beat):
         subdivided_track = []
@@ -106,14 +106,16 @@ class ScoreFactory():
             return TwinkleTwinkleScore()
         elif title == Pieces.Pachabels:
             return PachabelScore()
+        elif title == Pieces.ShortPachabels:
+            return ScoreBuilder('../../res/midi/Pachabels/short_pachabels.mid', Duration(0.25)).build()
         else:
-            return ScoreBuilder('../../res/midi/Pachabels/short_pachabels.mid',
-                                Duration(0.25)).build()
+            return None
 
 
 class Pieces(Enum):
     Twinkle = "Twinkle Twinkle Little Star"
     Pachabels = "Pachabels Canon"
+    ShortPachabels = "Short Pachabels"
 
 
 class Score():
