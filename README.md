@@ -40,27 +40,29 @@ In another terminal window, run
 python follow_headset.py <local_ip> <port>
 ```
 
-`local_ip` - If you're on a mac, open up System Preferences > Network. Your local IP should be stated there.
+* `local_ip` - If you're on a mac, open up System Preferences > Network. Your local IP should be stated there.
 
-`port` - Pick a port that you want to use. i.e. 4000
+* `port` - Pick a port that you want to use. _i.e. 4000_
 
 **Without Oculus Headset**
 ```
 python follow.py <piece> <tempo>
 ```
 
-`piece` - Name of the piece you want to follow
+* `piece` - Name of the piece you want to follow
 
-`tempo` - Beats per minute. i.e. 60
+* `tempo` - Beats per minute. _i.e. 60_
 
 ## Tests
 
-Will write soon :/
+```
+pytest test
+```
 
 ## Credits
 
-The techniques used in this project are largely a reimplementation of the methods discussed in the following papers.
+The techniques used in this project are my interpretation/implementation of the methods and ideas from the following papers.
 
 * Nakamura, Tomohiko, et al. “Real-Time Audio-to-Score Alignment of Music Performances Containing Errors and Arbitrary Repeats and Skips.” IEEE/ACM Transactions on Audio, Speech, and Language Processing, vol. 24, no. 2, Feb. 2016, pp. 329–39. arXiv.org, doi:10.1109/TASLP.2015.2507862., https://arxiv.org/pdf/1512.07748.pdf
-* Rao, Anyi, and Francis Lau. “Automatic Music Accompanist.” ArXiv:1803.09033 [Cs, Eess], Mar. 2018. arXiv.org, http://arxiv.org/abs/1803.09033.
 * Nakamura, Eita, et al. Autoregressive Hidden Semi-Markov Model of Symbolic Music Performance for Score Following. 2015. hal.inria.fr, https://hal.inria.fr/hal-01183820.
+* Rao, Anyi, and Francis Lau. “Automatic Music Accompanist.” ArXiv:1803.09033 [Cs, Eess], Mar. 2018. arXiv.org, http://arxiv.org/abs/1803.09033.
