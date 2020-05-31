@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class KalmanFilter:
 
     def __init__(self, current_estimate, estimate_error=100 ** 2, measurement_error=10 ** 2, kalman_gain=None,
@@ -32,6 +33,7 @@ class KalmanFilter:
         self.create_estimate(measurement)
         self.update_error()
         return self.current_estimate
+
 
 if __name__ == "__main__":
     kalman_filter = KalmanFilter(60)

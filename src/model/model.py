@@ -11,6 +11,8 @@ from numpy.linalg import det, inv
 from src.utils.calculations import MathHelper
 from src.music.score import Pieces, ScoreFactory
 
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 class Model:
 
@@ -46,7 +48,7 @@ class Model:
 
         self.instrument = instrument
 
-        self.MEAN_COV_DIR = "../../res/"
+        self.MEAN_COV_DIR = f"{THIS_DIR}/../../res/"
         self.mu = {}
         self.Sigma = {}
         self.inv_det = {}

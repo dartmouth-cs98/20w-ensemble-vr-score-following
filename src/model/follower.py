@@ -2,10 +2,11 @@ import queue
 import sys
 import threading
 import time
+import logging
 
 import numpy as np
 
-from src.interface.headset import HeadsetClient, MessageBuilder
+from src.interface.headset import HeadsetClient, MessageBuilder, MessageType
 
 sys.path.append('../../')
 
@@ -28,10 +29,6 @@ class RecordThread(threading.Thread):
         print("Starting Recording Thread")
         self.audio_client.record()
 
-        if self.save:
-            recording = np.array([self.audio_client.q.get() for i in range(self.audio_client.q.qsize())]).T
-            np.save("Pachabels_Recording", recording)
-
 
 class HeadSetCommThread(threading.Thread):
     def __init__(self, follower):
@@ -49,24 +46,42 @@ class Follower:
     Class that wraps together all the components needed to perform score following.
     """
 
-    def __init__(self, with_headset: bool, piece: Pieces, bpm: int, local_ip: str, port: int):
+    def __init__(self, with_headset: bool, piece: Pieces = None, bpm: int = 60, local_ip: str = None,
+                 port: int = None):
+        self.with_headset = with_headset
+        try:
+            if self.with_headset:
+                assert local_ip is not None and port is not None
+
+                # Connect to Websocket Server
+                self.headset_client = HeadsetClient(local_ip, port)
+                self.output_q = queue.Queue()
+
+                logging.info(f"Waiting for Song Selection...")
+                song = MessageBuilder.parse_message(self.headset_client.receive())
+                while type(song) != Pieces:
+                    logging.info("Invalid Song Choice, Waiting for Song Selection...")
+                    time.sleep(0.05)
+                    piece, bpm = MessageBuilder.parse_message(self.headset_client.receive())
+                logging.info(f"Song Selected: {song}, Tempo {bpm}")
+            else:
+                assert piece is not None and bpm is not None
+        except AssertionError as e:
+            logging.error("Invalid Parameters")
+            raise Exception(e.args)
+        except Exception as e:
+            logging.error("An Error Occurred")
+            raise Exception(e.args)
+
         self.audio_client = AudioClient()
         self.model = Model(self.audio_client, piece=piece, tempo=bpm)
         self.accompaniment = AccompanimentService(self.model.score)
         self.tempo = KalmanFilter(self.model.score.tempo)
         self.math_helper = MathHelper()
 
-        # self.live = True
-        # self.timed = False
-
         self.prev_state = None
         self.prev_note_val = None
         self.duration = 1
-
-        self.with_headset = with_headset
-        if self.with_headset:
-            self.headset_client = HeadsetClient(local_ip, port)
-            self.output_q = queue.Queue()
 
     def _reset_probabilities(self, prob):
         """
@@ -137,6 +152,11 @@ class Follower:
             if self.with_headset:
                 headset_thread = HeadSetCommThread(self)
                 headset_thread.start()
+
+                logging.info("Waiting for Start Signal...")
+                while MessageBuilder.parse_message(self.headset_client.receive()) != MessageType.Start:
+                    time.sleep(.05)
+                logging.info("Start Signal Received.")
 
             i = 0
             while True:
