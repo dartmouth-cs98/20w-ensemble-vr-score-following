@@ -1,5 +1,5 @@
 numpy==1.18.1
-scipy==1.1.0
+# scipy==1.1.0
 matplotlib==2.2.2
 pretty_midi==0.2.8
 librosa==0.7.2
