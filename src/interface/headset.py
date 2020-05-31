@@ -8,6 +8,7 @@ from websockets import connect
 from src.music.note import Pitch
 from src.music.score import Pieces
 
+
 class HeadsetClient:
     """
     Websocket client responsible for sending/receiving information from headset.
@@ -40,6 +41,7 @@ class HeadsetClient:
         message = await self.ws.recv()
         print("Received: ", message)
 
+
 class MessageBuilder:
     """
     Helper class that helps send and parse information to and to and from the headset.
@@ -54,7 +56,8 @@ class MessageBuilder:
         """
         payload = {
             "type": MessageType.Accompaniment.value,
-            "data": {"inst" + str(part): notes[part].pitch if notes[part].pitch != Pitch.REST else -1 for part in range(len(notes))}
+            "data": {"inst" + str(part): notes[part].pitch if notes[part].pitch != Pitch.REST else -1 for part in
+                     range(len(notes))}
         }
         return payload
 
@@ -67,13 +70,11 @@ class MessageBuilder:
         """
         json_msg = json.loads(message)
         if json_msg["type"] == MessageType.ChoosePiece:
-             if json_msg["data"]["name"] == Pieces.Pachabels:
-                 return Pieces.Pachabels
+            if json_msg["data"]["name"] == Pieces.TestPachabels:
+                return Pieces.TestPachabels
+
 
 class MessageType(Enum):
     ChoosePiece = "song_selection",
     Start = "start"
     Accompaniment = "accompaniment"
-
-
-
