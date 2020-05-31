@@ -14,7 +14,7 @@ from src.music.score import Pieces, ScoreFactory
 
 class Model:
 
-    def __init__(self, audio_client, tempo=None, instrument="violin", piece=Pieces.Twinkle):
+    def __init__(self, audio_client, tempo=None, instrument="violin", piece=Pieces.TestTwinkle):
         self.piece = piece
         self.score = ScoreFactory.get_score(piece)
         if tempo is not None:
@@ -36,9 +36,13 @@ class Model:
         # probability of entering break state, 1 * 10^{-x} for some positive x
         self.s = 1.0e-1000
         # probability of resuming performance, uniform for all N
-        self.r = 1 / (2*self.N)
+        self.r = 1 / (2 * self.N)
         # probability of deletion error
         self.p_del = 1.0e-75
+        self.pause_self_loop = 0.996
+
+        # Used when calculating self loop probabilities. Different from audio client fpm
+        self.recording_speed = 1140
 
         self.instrument = instrument
 
@@ -142,13 +146,14 @@ class Model:
         :return:
         """
 
-        np.fill_diagonal(self.a[:, 0, :, 0], self.math_helper.bpm_to_prob(self.score.tempo, beat_value=self.score.sub_beat.value,
-                                                          recording_speed=570))
-        self.a[self.N, 0, self.N, 0] = 0.996
+        np.fill_diagonal(self.a[:, 0, :, 0],
+                         self.math_helper.bpm_to_prob(self.score.tempo, beat_value=self.score.sub_beat.value,
+                                                      recording_speed=self.recording_speed))
+        self.a[self.N, 0, self.N, 0] = self.pause_self_loop
 
     def initialize_transition_matrix(self):
         """
-        intializes transition matrix 'a'
+        initializes transition matrix 'a'
         where a[j,l',i,l] represents the transition probabilities of the standard HMM
         from top state j bottom state l' to top state i bottom state l
         :return:
@@ -173,7 +178,8 @@ class Model:
 
             for j in range(self.N):
                 if j - i > 2 or j - i < 0:  # j not in nbh(i)
-                    self.a[i, 0, j, 0] = self.e[i, 0] * self.s * self.r * self.pi[j, 0]  # Eq. 12 (j and i are backwards)
+                    self.a[i, 0, j, 0] = self.e[i, 0] * self.s * self.r * self.pi[
+                        j, 0]  # Eq. 12 (j and i are backwards)
 
             # transition probability to break state eq. 14
             self.a[i, 0, self.N, 0] = self.e[i, 0] * self.s * self.pi[self.N, 0]
@@ -317,7 +323,6 @@ class Model:
             self.alpha = obs_prob * trans_prob
             return np.unravel_index(np.argmax(self.alpha), self.alpha.shape), np.max(self.alpha)
 
-
     def update_tempo(self):
         """
         Updates the self-loop probabilities as well as other transitions to reflect current tempo.
@@ -325,9 +330,10 @@ class Model:
         :return:
         """
         self.parse_piece()
-        next_state_prob = 1 - self.s - np.diag(self.a[:,0,:,0]) - np.pad(np.diag(self.a[:,0,2:,0]), (0,2), 'constant')
-        next_state_prob = self.e * np.stack([next_state_prob] * self.L, axis=1) * np.stack([self.pi[:,0]] * self.L, axis=1)
-        np.fill_diagonal(self.a[:,0,1:,0], next_state_prob[:,0])
+        next_state_prob = 1 - self.s - np.diag(self.a[:, 0, :, 0]) - np.pad(np.diag(self.a[:, 0, 2:, 0]), (0, 2),
+                                                                            'constant')
+        next_state_prob = self.e * np.stack([next_state_prob] * self.L, axis=1) * np.stack([self.pi[:, 0]] * self.L,
+                                                                                           axis=1)
+        np.fill_diagonal(self.a[:, 0, 1:, 0], next_state_prob[:, 0])
         if self.L > 1:
-            np.fill_diagonal(self.a[:, 1, 1:, 0], next_state_prob[:,1])
-
+            np.fill_diagonal(self.a[:, 1, 1:, 0], next_state_prob[:, 1])

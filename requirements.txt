@@ -1,9 +1,10 @@
-scipy==1.1.0
-matplotlib==2.2.2
 numpy==1.18.1
+# scipy==1.1.0
+matplotlib==2.2.2
 pretty_midi==0.2.8
 librosa==0.7.2
 fluidsynth==0.2
 music21==5.7.2
 sounddevice==0.3.15
 websockets==8.1
+pytest==5.4.2

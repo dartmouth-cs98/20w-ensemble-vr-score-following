@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class Note:
     def __init__(self, pitch, duration, is_note_start=False, is_note_end=False):
         self.pitch = pitch
@@ -30,6 +31,7 @@ class Note:
             "B": Pitch.B
         }
         return map[note_name] if not note_name[-1].isdigit() else map[note_name[:-1]]
+
 
 class Pitch(Enum):
     REST = -1

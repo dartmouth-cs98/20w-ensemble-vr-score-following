@@ -1,5 +1,4 @@
 from src.interface.audio import AudioClient
-import pickle
 import numpy as np
 
 if __name__ == "__main__":
@@ -23,4 +22,5 @@ if __name__ == "__main__":
 
     np.save("res/mean_-1", mean)
     np.save("res/cov_-1", cov)
+
 

@@ -13,7 +13,9 @@ class AudioClient:
     Class that handles input from microphone
     """
 
-    def __init__(self, sample_rate=44100, window=200, channels=[1], downsample=10, interval=30, blocksize=2048):
+    def __init__(self, sample_rate=44100, window=200, channels=None, downsample=10, interval=30, blocksize=2048):
+        if channels is None:
+            channels = [1]
         self.sample_rate = sample_rate
         self.window = window
         self.channels = channels
@@ -66,26 +68,3 @@ class AudioClient:
         print("Mean:", sample_mean)
         print("Cov: ", sample_cov)
         return sample_mean, sample_cov
-
-
-if __name__ == "__main__":
-    import time
-
-    for i in range(12):
-        input("Press Return to Begin Recording for Pitch {0}".format(i))
-        time.sleep(2)
-        client = AudioClient()
-        client.record(plot=True, time=10)
-        mean, cov = client.estimate_mean_covariance()
-
-        np.save("res/mean_{0}".format(i), mean)
-        np.save("res/cov_{0}".format(i), cov)
-
-    input("Press Return to Begin Recording for Silence")
-    time.sleep(2)
-    client = AudioClient()
-    client.record(plot=True, time=10)
-    mean, cov = client.estimate_mean_covariance()
-
-    np.save("res/mean_-1", mean)
-    np.save("res/cov_-1", cov)

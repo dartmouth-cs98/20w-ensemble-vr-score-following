@@ -47,7 +47,7 @@ class MidiClient:
                         pitch = event.pitch
 
                 num_beats = round(delta_time.time / self.midi_file.ticksPerQuarterNote, 2)
-                while num_beats > 4:        # while num beats is greater than beats left in bar.
+                while num_beats > 4:  # while num beats is greater than beats left in bar.
                     notes.append(Note(pitch, Duration(4).value))
                     num_beats -= 4
 
