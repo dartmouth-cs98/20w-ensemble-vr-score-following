@@ -3,10 +3,12 @@ import asyncio
 import websockets
 from websockets import WebSocketServerProtocol
 import time
+
 logging.basicConfig(level=logging.INFO)
 
+
 # Code adapted from https://medium.com/better-programming/how-to-create-a-websocket-in-python-b68d65dbd549
-class Server():
+class Server:
     clients = set()
 
     async def register(self, ws):
@@ -34,7 +36,8 @@ class Server():
             print(message, ws.remote_address, time.time())
             await self.send_to_clients(message)
 
-if __name__== "__main__":
+
+if __name__ == "__main__":
     logging.info("Starting Server....")
     server = Server()
     start_server = websockets.serve(server.ws_handler, '192.168.0.5', 4000)

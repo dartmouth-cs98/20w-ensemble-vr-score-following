@@ -1,12 +1,11 @@
 import sys
-import time
+
 import fluidsynth
-import logging
 
 from src.music.note import Pitch
-from src.music.score import TwinkleTwinkleScore
 
 sys.path.append('../../')
+
 
 class AccompanimentService:
 

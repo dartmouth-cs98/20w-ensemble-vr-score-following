@@ -1,11 +1,11 @@
-import threading
-import numpy as np
-import sys
-import time
 import queue
+import sys
+import threading
+import time
+
+import numpy as np
 
 from src.interface.headset import HeadsetClient, MessageBuilder
-from src.music.note import Note, Pitch
 
 sys.path.append('../../')
 
@@ -29,7 +29,7 @@ class RecordThread(threading.Thread):
         self.audio_client.record()
 
         if self.save:
-            recording = np.concatenate(self.audio_client.q, axis=1)
+            recording = np.array([self.audio_client.q.get() for i in range(self.audio_client.q.qsize())]).T
             np.save("Pachabels_Recording", recording)
 
 
@@ -49,9 +49,9 @@ class Follower:
     Class that wraps together all the components needed to perform score following.
     """
 
-    def __init__(self, with_headset: bool, piece: Pieces):
+    def __init__(self, with_headset: bool, piece: Pieces, bpm: int, local_ip: str, port: int):
         self.audio_client = AudioClient()
-        self.model = Model(self.audio_client, piece=piece, tempo=60)
+        self.model = Model(self.audio_client, piece=piece, tempo=bpm)
         self.accompaniment = AccompanimentService(self.model.score)
         self.tempo = KalmanFilter(self.model.score.tempo)
         self.math_helper = MathHelper()
@@ -65,7 +65,7 @@ class Follower:
 
         self.with_headset = with_headset
         if self.with_headset:
-            self.headset_client = HeadsetClient("192.168.0.5", 4000)
+            self.headset_client = HeadsetClient(local_ip, port)
             self.output_q = queue.Queue()
 
     def _reset_probabilities(self, prob):
@@ -173,8 +173,3 @@ class Follower:
                     self.prev_note_val = played_note_val
         finally:
             print("Time Elapsed: ", time.time() - ts)
-
-
-if __name__ == "__main__":
-    follower = Follower(with_headset=False, piece=Pieces.ShortPachabels)
-    follower.follow()

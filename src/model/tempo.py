@@ -29,22 +29,3 @@ class KalmanFilter:
         self.create_estimate(measurement)
         self.update_error()
         return self.current_estimate
-
-
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-
-    kalman_filter = KalmanFilter(60)
-
-    observed_tempos = [60, 65, 62, 63, 64, 65, 60, 65, 65, 66, 67, 68, 68, 68, 68, 68, 68, 68]
-    filter = []
-    for tempo in observed_tempos:
-        filter.append(kalman_filter.next_measurement(tempo))
-
-    plt.plot(observed_tempos, color="green")
-    plt.plot(filter, color="red")
-    plt.xlabel("nth observation")
-    plt.ylabel("Tempo")
-    plt.legend(["observed tempos", "estimated tempo"])
-    plt.title("Tempo Adjustment Test")
-    plt.show()

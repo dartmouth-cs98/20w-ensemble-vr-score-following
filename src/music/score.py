@@ -10,13 +10,17 @@ from src.interface.midi import MidiClient
 from src.music.note import Note, Pitch, Duration
 
 
-class ScoreBuilder():
+class ScoreBuilder:
+    """
+    Class that given a midi file and a beat to subdivide into, creates a Score object for the Follower.
+    """
 
     def __init__(self, filename, sub_beat):
         self.reset()
         self.midi_client = MidiClient()
         self.midi_client.load_file(filename)
         self.sub_beat = sub_beat
+        self.set_sub_beat(sub_beat)
         self.parts = [
             self.midi_client.parse_track(i, is_solo=False) if i != 0 else self.midi_client.parse_track(i)
             for i in range(len(self.midi_client.midi_file.tracks))
@@ -79,7 +83,11 @@ class ScoreBuilder():
         self.product.accompaniment.insert(0, {Note(Pitch.REST, self.sub_beat.value)})
         self.product.parts = np.hstack((np.array([[Note(Pitch.REST, self.sub_beat.value)]] * self.product.parts.shape[0]), self.product.parts))
 
-    def _subdivide_track(self, notes, sub_beat):
+    def set_sub_beat(self, sub_beat):
+        self.product.sub_beat = sub_beat
+
+    @staticmethod
+    def _subdivide_track(notes, sub_beat):
         subdivided_track = []
         for note in notes:
             num_subdivisions = note.duration / sub_beat.value
@@ -99,12 +107,12 @@ class ScoreBuilder():
         return product
 
 
-class ScoreFactory():
+class ScoreFactory:
     @staticmethod
     def get_score(title):
-        if title == Pieces.Twinkle:
+        if title == Pieces.TestTwinkle:
             return TwinkleTwinkleScore()
-        elif title == Pieces.Pachabels:
+        elif title == Pieces.TestPachabels:
             return PachabelScore()
         elif title == Pieces.ShortPachabels:
             return ScoreBuilder('../../res/midi/Pachabels/short_pachabels.mid', Duration(0.25)).build()
@@ -113,12 +121,12 @@ class ScoreFactory():
 
 
 class Pieces(Enum):
-    Twinkle = "Twinkle Twinkle Little Star"
-    Pachabels = "Pachabels Canon"
+    TestTwinkle = "Twinkle Twinkle Little Star"
+    TestPachabels = "Pachabels Canon"
     ShortPachabels = "Short Pachabels"
 
 
-class Score():
+class Score:
     def __init__(self):
         self.subdivided_notes = None
         self.parts = None
@@ -151,6 +159,9 @@ class Score():
 
 
 class PachabelScore(Score):
+    """
+    Hard Coded Score mostly used for testing
+    """
     def __init__(self):
         super().__init__()
         self.title = "Pachabel's Canon in D"
@@ -161,9 +172,7 @@ class PachabelScore(Score):
         self.sub_beat = Duration(0.5)
 
     def set_notes(self):
-        self.subdivided_notes = [Note(Pitch.D, Duration(0.5)),  # Bullshit Note
-                                 Note(Pitch.REST, Duration(0.5)),
-                                 Note(Pitch.REST, Duration(0.5)),
+        self.subdivided_notes = [Note(Pitch.REST, Duration(0.5)),
                                  Note(Pitch.F_SHARP_G_FLAT, Duration(0.5)),
                                  Note(Pitch.F_SHARP_G_FLAT, Duration(0.5)),
                                  Note(Pitch.F_SHARP_G_FLAT, Duration(0.5)),
@@ -210,6 +219,9 @@ class PachabelScore(Score):
 
 
 class TwinkleTwinkleScore(Score):
+    """
+    Hardcoded First line of Twinkle Twinkle Little Star meant for testing.
+    """
 
     def __init__(self):
         super().__init__()
@@ -218,6 +230,7 @@ class TwinkleTwinkleScore(Score):
         self.set_notes()
         self.set_tempo()
         self.set_accompaniment()
+        self.sub_beat = Duration(1.0)
 
     def set_notes(self):
         # self.notes = [2, 2, 9, 9, 11, 11, 9, 7, 7, 6, 6, 4, 4, 2]
