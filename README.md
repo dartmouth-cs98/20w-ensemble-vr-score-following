@@ -1,5 +1,7 @@
 # 20W Ensemble-VR Score-Following
 
+[![dartmouth-cs98](https://circleci.com/gh/dartmouth-cs98/20w-ensemble-vr-score-following.svg?style=svg)](https://app.circleci.com/pipelines/github/dartmouth-cs98/20w-ensemble-vr-score-following)
+
 This repository contains the score-following component of **EnsembleVR**. Please check out the [github wiki](https://github.com/dartmouth-cs98/20w-ensemble-vr-score-following/wiki) for documentation regarding implementation/design choices.
 
 **EnsembleVR** is a virtual reality application built using `Unity3D` for the Oculus Quest. One issue that most, if not all, musicians face is the fact that performing in front of a live audience, on-stage is completely different from practicing alone in your room. Additionally, for musicians whose performances often include accompaniment and or involve other musicians, it's often difficult or sometimes even impossible to have the opportunity to play a piece as it was intended -- with the full accompaniment. For example, many classical concertos involve a complete orchestra, but for the average casual musician, one might never have the chance to solo alongside a professional orchestra. Of course, one could simply play a recording of the accompaniment part and play along to that, but this is no where near as satisfying as playing alongside a live accompanist who would speed up, slow down, and follow your expressive interpretations/nuances.
