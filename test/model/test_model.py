@@ -6,7 +6,6 @@ import pytest
 sys.path.append('../../')
 
 from src.music.score import Pieces
-from src.interface.audio import AudioClient
 from src.model.model import Model
 
 LENGTH_THRESHOLD = 3
@@ -24,8 +23,7 @@ def test_pieces_integration(piece, tempo, recording):
     :param recording: str path to recording
     :return:
     """
-    audio_client = AudioClient()
-    model = Model(audio_client, piece=piece, tempo=tempo)
+    model = Model(None, piece=piece, tempo=tempo)
 
     t = 0
     q = np.load(recording)[:, :]
