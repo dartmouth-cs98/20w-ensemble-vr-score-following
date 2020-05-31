@@ -1,6 +1,6 @@
+numpy==1.18.1
 scipy==1.1.0
 matplotlib==2.2.2
-numpy==1.18.1
 pretty_midi==0.2.8
 librosa==0.7.2
 fluidsynth==0.2
