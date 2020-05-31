@@ -121,9 +121,9 @@ class ScoreFactory:
 
 
 class Pieces(Enum):
-    TestTwinkle = "Twinkle Twinkle Little Star"
-    TestPachabels = "Pachabels Canon"
-    ShortPachabels = "Short Pachabels"
+    TestTwinkle = "testTwinkle"
+    TestPachabels = "testPachabels"
+    ShortPachabels = "canonInD"
 
 
 class Score:

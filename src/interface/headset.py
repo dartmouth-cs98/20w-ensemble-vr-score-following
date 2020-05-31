@@ -40,6 +40,7 @@ class HeadsetClient:
     async def __async__receive(self):
         message = await self.ws.recv()
         print("Received: ", message)
+        return message
 
 
 class MessageBuilder:
@@ -69,12 +70,21 @@ class MessageBuilder:
         :return:
         """
         json_msg = json.loads(message)
-        if json_msg["type"] == MessageType.ChoosePiece:
-            if json_msg["data"]["name"] == Pieces.TestPachabels:
-                return Pieces.TestPachabels
+        if json_msg["type"] == MessageType.ChoosePiece.value:
+            name = json_msg["data"]["song_name"]
+            tempo = int(json_msg["data"]["tempo"])
+
+            if name == Pieces.TestPachabels.value:
+                return Pieces.TestPachabels, tempo
+            elif name == Pieces.TestTwinkle.value:
+                return Pieces.TestTwinkle, tempo
+            else:
+                return Pieces.ShortPachabels, tempo
+        if json_msg["type"] == MessageType.Start.value:
+            return MessageType.Start
 
 
 class MessageType(Enum):
-    ChoosePiece = "song_selection",
+    ChoosePiece = "song_selection"
     Start = "start"
     Accompaniment = "accompaniment"

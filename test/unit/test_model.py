@@ -1,9 +1,10 @@
 import numpy as np
 import sys
+import os
 
 import pytest
-
-sys.path.append('../../')
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+recordings_path = os.path.join(THIS_DIR, os.pardir, '../res/data/')
 
 from src.music.score import Pieces
 from src.model.model import Model
@@ -12,8 +13,8 @@ LENGTH_THRESHOLD = 3
 
 
 @pytest.mark.parametrize("piece,tempo,recording", [
-    (Pieces.TestTwinkle, 60, "../../res/data/Twinkle_Recording.npy"),
-    (Pieces.TestPachabels, 60, "../../res/data/Pachabels_Recording.npy"),
+    (Pieces.TestTwinkle, 60, f"{recordings_path}Twinkle_Recording.npy"),
+    (Pieces.TestPachabels, 60, f"{recordings_path}Pachabels_Recording.npy"),
 ])
 def test_pieces_integration(piece, tempo, recording):
     """

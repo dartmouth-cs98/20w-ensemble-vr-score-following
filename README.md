@@ -1,6 +1,6 @@
 # 20W Ensemble-VR Score-Following
 
-[![dartmouth-cs98](https://circleci.com/gh/dartmouth-cs98/20w-ensemble-vr-score-following.svg?style=svg)](https://app.circleci.com/pipelines/github/dartmouth-cs98/20w-ensemble-vr-score-following)
+[![dartmouth-cs98](https://circleci.com/gh/dartmouth-cs98/20w-ensemble-vr-score-following.svg?style=shield)](https://app.circleci.com/pipelines/github/dartmouth-cs98/20w-ensemble-vr-score-following)
 
 This repository contains the score-following component of **EnsembleVR**. Please check out the [github wiki](https://github.com/dartmouth-cs98/20w-ensemble-vr-score-following/wiki) for documentation regarding implementation/design choices.
 
@@ -23,15 +23,35 @@ pip install -r requirements.txt
 
 ## Usage
 
-With Oculus headset and accompanying Unity3D app
+Begin by moving into the scripts directory
 ```
-python3 src/scripts/follow_headset.py
+cd src/scripts
+```
+Depending on your use case, use the following commands. These commands assume `python3`
+
+**With Oculus headset and accompanying Unity3D app**
+
+In one terminal window, begin the websockets server
+```
+python start_server.py <local_ip> <port>
+```
+In another terminal window, run
+```
+python follow_headset.py <local_ip> <port>
 ```
 
-Without Oculus Headset
+`local_ip` - If you're on a mac, open up System Preferences > Network. Your local IP should be stated there.
+
+`port` - Pick a port that you want to use. i.e. 4000
+
+**Without Oculus Headset**
 ```
-python3 src/scripts/follow.py
+python follow.py <piece> <tempo>
 ```
+
+`piece` - Name of the piece you want to follow
+
+`tempo` - Beats per minute. i.e. 60
 
 ## Tests
 

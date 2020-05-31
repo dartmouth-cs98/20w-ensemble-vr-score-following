@@ -1,10 +1,11 @@
 import pickle
 import numpy as np
-
+import os
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class MathHelper:
     def __init__(self):
-        with open("../../res/data/tempo_args_1.pkl", 'rb') as pickle_file:
+        with open(f"{THIS_DIR}/../../res/data/tempo_args_1.pkl", 'rb') as pickle_file:
             self.args = pickle.load(pickle_file)
 
     @staticmethod
