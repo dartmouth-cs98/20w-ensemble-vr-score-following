@@ -10,7 +10,7 @@ jobs:
       - checkout
       - python/load-cache
       - run:
-          command: python -m pip install --user numpy==1.18.1 scipy==1.1.0 matplotlib ipython jupyter pandas sympy nose
+          command: python -m pip install --user numpy scipy matplotlib ipython jupyter pandas sympy nose
           name: Install
       - python/install-deps
       - python/save-cache
