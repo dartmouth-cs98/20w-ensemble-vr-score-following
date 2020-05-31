@@ -2,8 +2,8 @@ from src.model.tempo import KalmanFilter
 import matplotlib.pyplot as plt
 import numpy as np
 
-ERROR_MAX_THRESHOLD = 1.5
-ERROR_MIN_THRESHOLD = 0.5
+ERROR_MAX_THRESHOLD = 2
+ERROR_MIN_THRESHOLD = 0.1
 
 
 def test_kalman_filter():

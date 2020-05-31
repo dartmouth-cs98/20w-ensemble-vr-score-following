@@ -46,7 +46,7 @@ class ScoreBuilder:
 
     def create_subdivision_mapping(self, notes):
         """
-        Returns mapping of model-returned index i.e. the subdivided index to the actual index of the note.
+        Returns mapping of unit-returned index i.e. the subdivided index to the actual index of the note.
         :param notes:
         :return:
         """
