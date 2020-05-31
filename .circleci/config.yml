@@ -10,8 +10,9 @@ jobs:
       - checkout
       - python/load-cache
       - run:
-          command: cat requirements.txt | xargs pip install
+          command: pip install numpy
           name: Install
+      - python/install-deps
       - python/save-cache
       - run:
           command: ./manage.py test
