@@ -71,7 +71,7 @@ class Follower:
     def _reset_probabilities(self, prob):
         """
         Resets probabilities in alpha table if they get too small to prevent underflow
-        :param prob: Probability returned by model
+        :param prob: Probability returned by unit
         :return: None
         """
         if prob < 1.0e-110:
@@ -80,7 +80,7 @@ class Follower:
     def _play_accompaniment(self, current_state):
         """
         Play accompaniment given current state
-        :param current_state: state predicted by model
+        :param current_state: state predicted by unit
         :return: None
         """
         if self.prev_state is not None and current_state[0] - self.prev_state <= 2 and current_state[

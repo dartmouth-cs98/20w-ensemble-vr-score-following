@@ -2,8 +2,8 @@ from src.model.tempo import KalmanFilter
 import matplotlib.pyplot as plt
 import numpy as np
 
-ERROR_MAX_THRESHOLD = 1.5
-ERROR_MIN_THRESHOLD = 0.5
+ERROR_MAX_THRESHOLD = 2
+ERROR_MIN_THRESHOLD = 0.1
 
 
 def test_kalman_filter():
@@ -22,11 +22,3 @@ def test_kalman_filter():
         error_noise = [abs(observed_tempos[i] - filter_values[i]) for i in range(len(true_tempos))]
         assert np.mean(error_noise) < ERROR_MAX_THRESHOLD
         assert np.mean(error_noise) > ERROR_MIN_THRESHOLD
-
-    plt.plot(observed_tempos, color="green")
-    plt.plot(filter_values, color="red")
-    plt.xlabel("nth observation")
-    plt.ylabel("Tempo")
-    plt.legend(["observed tempos", "estimated tempo"])
-    plt.title("Tempo Adjustment Test")
-    plt.show()
