@@ -15,7 +15,7 @@ jobs:
       - python/install-deps
       - python/save-cache
       - run:
-          command: pip install -U pytest ; cd test/unit ; py.test
+          command: pip install -U pytest ; cd test/unit ; python -m pytest
           name: Test
 
 workflows:
