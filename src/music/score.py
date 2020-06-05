@@ -1,12 +1,10 @@
-import sys
-
-sys.path.append('../../')
-from enum import Enum
 from abc import abstractmethod
+from enum import Enum
+
 import numpy as np
 import pretty_midi
-from src.interface.midi import MidiClient
 
+from src.interface.midi import MidiClient
 from src.music.note import Note, Pitch, Duration
 
 
@@ -16,6 +14,7 @@ class ScoreBuilder:
     """
 
     def __init__(self, filename, sub_beat):
+        self.product = None
         self.reset()
         self.midi_client = MidiClient()
         self.midi_client.load_file(filename)
@@ -46,7 +45,7 @@ class ScoreBuilder:
 
     def create_subdivision_mapping(self, notes):
         """
-        Returns mapping of unit-returned index i.e. the subdivided index to the actual index of the note.
+        Returns mapping of integration-returned index i.e. the subdivided index to the actual index of the note.
         :param notes:
         :return:
         """
@@ -81,7 +80,9 @@ class ScoreBuilder:
         self.product.notes.insert(0, Note(pitch, self.sub_beat.value))
         self.product.subdivided_notes.insert(0, Note(pitch, self.sub_beat.value))
         self.product.accompaniment.insert(0, {Note(Pitch.REST, self.sub_beat.value)})
-        self.product.parts = np.hstack((np.array([[Note(Pitch.REST, self.sub_beat.value)]] * self.product.parts.shape[0]), self.product.parts))
+        self.product.parts = np.hstack(
+            (np.array([[Note(Pitch.REST, self.sub_beat.value)]] * self.product.parts.shape[0]), self.product.parts)
+        )
 
     def set_sub_beat(self, sub_beat):
         self.product.sub_beat = sub_beat
@@ -91,7 +92,7 @@ class ScoreBuilder:
         subdivided_track = []
         for note in notes:
             num_subdivisions = note.duration / sub_beat.value
-            subdivided_note = [Note(note.pitch, sub_beat) for i in range(int(num_subdivisions))]
+            subdivided_note = [Note(note.pitch, sub_beat) for _ in range(int(num_subdivisions))]
             subdivided_note[0].is_note_start = True
             subdivided_note[len(subdivided_note) - 1].is_note_end = True
 
@@ -162,6 +163,7 @@ class PachabelScore(Score):
     """
     Hard Coded Score mostly used for testing
     """
+
     def __init__(self):
         super().__init__()
         self.title = "Pachabel's Canon in D"

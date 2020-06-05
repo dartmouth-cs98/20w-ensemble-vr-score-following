@@ -1,15 +1,12 @@
 import logging
-import sys
-
-from src.music.note import Pitch
-
-sys.path.append('../../')
-
 import os
+
 import numpy as np
 from numpy.linalg import det, inv
-from src.utils.calculations import MathHelper
+
+from src.music.note import Pitch
 from src.music.score import Pieces, ScoreFactory
+from src.utils.calculations import MathHelper
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -33,14 +30,10 @@ class Model:
         self.pi = np.zeros((self.N + 1, self.L))  # initial probabilities matrix
         self.e = np.zeros((self.N + 1, self.L))  # exit probabilities matrix
 
-        # probability of pitch errors. Eq(17) Section IVB2.
-        self.C = 1.0e-50
-        # probability of entering break state, 1 * 10^{-x} for some positive x
-        self.s = 1.0e-1000
-        # probability of resuming performance, uniform for all N
-        self.r = 1 / (2 * self.N)
-        # probability of deletion error
-        self.p_del = 1.0e-75
+        self.C = 1.0e-50  # probability of pitch errors. Eq(17) Section IVB2.
+        self.s = 1.0e-1000  # probability of entering break state, 1 * 10^{-x} for some positive x
+        self.r = 1 / (2 * self.N)  # probability of resuming performance, uniform for all N
+        self.p_del = 1.0e-75  # probability of resuming performance, uniform for all N
         self.pause_self_loop = 0.996
 
         # Used when calculating self loop probabilities. Different from audio client fpm

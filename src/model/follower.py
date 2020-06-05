@@ -1,22 +1,15 @@
+import logging
 import queue
-import sys
 import threading
 import time
-import logging
 
-import numpy as np
-
+from src.interface.audio import AudioClient
 from src.interface.headset import HeadsetClient, MessageBuilder, MessageType
-
-sys.path.append('../../')
-
+from src.model.accompaniment import AccompanimentService
+from src.model.model import Model
+from src.model.tempo import KalmanFilter
 from src.music.score import Pieces
 from src.utils.calculations import MathHelper
-from src.interface.audio import AudioClient
-
-from src.model.tempo import KalmanFilter
-from src.model.model import Model
-from src.model.accompaniment import AccompanimentService
 
 
 class RecordThread(threading.Thread):
@@ -86,7 +79,7 @@ class Follower:
     def _reset_probabilities(self, prob):
         """
         Resets probabilities in alpha table if they get too small to prevent underflow
-        :param prob: Probability returned by unit
+        :param prob: Probability returned by integration
         :return: None
         """
         if prob < 1.0e-110:
@@ -95,11 +88,10 @@ class Follower:
     def _play_accompaniment(self, current_state):
         """
         Play accompaniment given current state
-        :param current_state: state predicted by unit
+        :param current_state: state predicted by integration
         :return: None
         """
-        if self.prev_state is not None and current_state[0] - self.prev_state <= 2 and current_state[
-            0] - self.prev_state >= 0:
+        if self.prev_state is not None and 2 >= current_state[0] - self.prev_state >= 0:
             note_event = current_state[0]
             self.accompaniment.play_accompaniment(note_event)
 
@@ -114,7 +106,7 @@ class Follower:
             prev_expected_duration = self.model.score.notes[self.prev_note_val].duration if type(
                 self.model.score.notes[self.prev_note_val - 1].duration) is int else self.model.score.notes[
                 self.prev_note_val - 1].duration
-            observed_fpb = (self.duration) * (1 / prev_expected_duration)  # This might be one off.
+            observed_fpb = self.duration * (1 / prev_expected_duration)  # This might be one off.
             observed_tempo = self.audio_client.frames_per_min / observed_fpb
             print("Observed Tempo: ", observed_tempo)
 

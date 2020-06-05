@@ -32,7 +32,7 @@ class AudioClient:
     def audio_callback(self, indata, frames, time, status):
         """This is called (from a separate thread) for each audio block."""
         if status:
-            print(status, file=sys.stderr)
+            print(status, frames, time, file=sys.stderr)
 
         data = indata.copy().squeeze()
         cqt = librosa.feature.chroma_cqt(y=data, sr=self.sample_rate)

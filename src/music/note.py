@@ -16,7 +16,7 @@ class Note:
 
     @staticmethod
     def note_name_to_pitch_enum(note_name):
-        map = {
+        note_to_pitch = {
             "C": Pitch.C,
             "C#": Pitch.C_SHARP_D_FLAT,
             "D": Pitch.D,
@@ -30,7 +30,7 @@ class Note:
             "A#": Pitch.A_SHARP_B_FLAT,
             "B": Pitch.B
         }
-        return map[note_name] if not note_name[-1].isdigit() else map[note_name[:-1]]
+        return note_to_pitch[note_name] if not note_name[-1].isdigit() else note_to_pitch[note_name[:-1]]
 
 
 class Pitch(Enum):

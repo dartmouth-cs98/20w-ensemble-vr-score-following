@@ -1,7 +1,9 @@
 import pickle
 import numpy as np
 import os
+
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+
 
 class MathHelper:
     def __init__(self):
@@ -19,7 +21,7 @@ class MathHelper:
         :param d:
         :return:
         """
-        return (np.log((y - d) / (a)) / (-c)) + b
+        return (np.log((y - d) / a) / (-c)) + b
 
     @staticmethod
     def tempo_to_fpb(x, a, b, c, d):

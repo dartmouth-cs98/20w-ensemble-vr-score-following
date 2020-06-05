@@ -1,10 +1,6 @@
-import sys
-
 import fluidsynth
 
 from src.music.note import Pitch
-
-sys.path.append('../../')
 
 
 class AccompanimentService:

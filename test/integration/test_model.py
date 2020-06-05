@@ -18,7 +18,7 @@ LENGTH_THRESHOLD = 3
 ])
 def test_pieces_integration(piece, tempo, recording):
     """
-    Sample audio from recording and put into unit.
+    Sample audio from recording and put into integration.
     :param piece: pieces object
     :param tempo: int beats per minute
     :param recording: str path to recording

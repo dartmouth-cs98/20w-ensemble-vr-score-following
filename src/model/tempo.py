@@ -38,7 +38,7 @@ class KalmanFilter:
 if __name__ == "__main__":
     kalman_filter = KalmanFilter(60)
 
-    true_tempos = [60, 65, 62, 63, 64, 65, 60, 65, 65, 66, 67, 68, 68, 68, 68, 68, 68, 68]
+    true_tempos = [60, 65, 62, 63, 64, 65, 60, 65, 65, 66, 67, 68, 68, 68, 68, 68, 68, 68, 70]
     observed_tempos = [tempo + np.random.normal(0, 1) for tempo in true_tempos]
     filter_values = [kalman_filter.next_measurement(tempo) for tempo in observed_tempos]
 

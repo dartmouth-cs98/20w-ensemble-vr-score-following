@@ -1,11 +1,8 @@
 import asyncio
 import logging
-import sys
 import time
 
 from websockets import WebSocketServerProtocol
-
-sys.path.append("../../")
 
 logging.basicConfig(level=logging.INFO)
 

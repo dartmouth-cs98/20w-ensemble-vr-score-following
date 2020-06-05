@@ -12,6 +12,7 @@ class MidiClient:
     def __init__(self, beats_per_measure=4):
         self.midi_file = None
         self.beats_per_measure = beats_per_measure
+        self.NOTE_ON = "NOTE_ON"
         pass
 
     def load_file(self, filename):
@@ -38,7 +39,7 @@ class MidiClient:
             delta_time = track.events[i + 1]
 
             if delta_time.time is not None and delta_time.time > 1:
-                if event.type != "NOTE_ON" or event.velocity == 0:
+                if event.type != self.NOTE_ON or event.velocity == 0:
                     pitch = Pitch.REST
                 else:
                     if is_solo:
