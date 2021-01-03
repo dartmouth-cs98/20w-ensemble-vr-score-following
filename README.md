@@ -4,9 +4,9 @@
 
 This repository contains the score-following component of **EnsembleVR**. Please check out the [github wiki](https://github.com/dartmouth-cs98/20w-ensemble-vr-score-following/wiki) for documentation regarding implementation/design choices.
 
-**EnsembleVR** is a virtual reality application built using `Unity3D` for the Oculus Quest. One issue that most, if not all, musicians face is the fact that performing in front of a live audience, on-stage is completely different from practicing alone in your room. Additionally, for musicians whose performances often include accompaniment and or involve other musicians, it's often difficult or sometimes even impossible to have the opportunity to play a piece as it was intended -- with the full accompaniment. For example, many classical concertos involve a complete orchestra, but for the average casual musician, one might never have the chance to solo alongside a professional orchestra. Of course, one could simply play a recording of the accompaniment part and play along to that, but this is no where near as satisfying as playing alongside a live accompanist who would speed up, slow down, and follow your expressive interpretations/nuances.
+**EnsembleVR** is a virtual reality application built using `Unity3D` for the Oculus Quest. Performing in front of a live audience on-stage is completely different from practicing alone in your own home. For music that requires accompaniment / other musicians, it's often difficult to play with the full accompaniment. For example, unless you're a famous musician, an average casual musician would never have the chance to solo with a live, full orchestra. You could play along to a recording, but that's not nearly as satisfying as playing with a live orchestra that adapts to you.
 
-The goal of this project, therefore, is to attempt to simulate, as realistically as possible, the experience of _performing_. This repo/wiki is primarily focused on answering the question:
+The goal of this project is to attempt to simulate, as realistically as possible, the experience of _performing_. This repo/wiki is primarily focused on answering the question:
 
 **How do we generate musical accompaniment in real-time according to a player's musical interpretations?**
 
