@@ -1,4 +1,4 @@
-numpy==1.18.1
+numpy==1.22.0
 # scipy==1.1.0
 matplotlib==2.2.2
 pretty_midi==0.2.8
